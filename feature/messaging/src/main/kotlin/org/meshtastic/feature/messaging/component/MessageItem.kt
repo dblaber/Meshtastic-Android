@@ -48,12 +48,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.database.entity.Reaction
 import org.meshtastic.core.database.model.Message
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.hops_away_template
+import org.meshtastic.core.strings.hops_out_of_total
+import org.meshtastic.core.strings.relayed_by
+import org.meshtastic.core.strings.relay_candidates
 import org.meshtastic.core.strings.reply
 import org.meshtastic.core.strings.sample_message
 import org.meshtastic.core.strings.via_mqtt
@@ -73,6 +77,8 @@ internal fun MessageItem(
     ourNode: Node,
     message: Message,
     selected: Boolean,
+    nodeMap: Map<Int, Node> = emptyMap(),
+    showRelayInfo: Boolean = false,
     onReply: () -> Unit = {},
     sendReaction: (String) -> Unit = {},
     onShowReactions: () -> Unit = {},
@@ -175,17 +181,95 @@ internal fun MessageItem(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (!message.fromLocal) {
-                            if (message.hopsAway == 0) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Snr(message.snr)
-                                    Rssi(message.rssi)
-                                }
-                            } else {
-                                Text(
-                                    text = stringResource(Res.string.hops_away_template, message.hopsAway),
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
+                        if (!message.fromLocal && message.hopsAway == 0) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Snr(message.snr)
+                                Rssi(message.rssi)
+                            }
+                        }
+
+                        // Show relay information for both received and sent messages (when heard back)
+                        if (showRelayInfo && (message.hopsAway > 0 || message.relayNode != null)) {
+                            Column {
+                                    message.relayNode?.let { relayNodeId ->
+                                        val relayNodeIdSuffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
+                                        val hexByte = "0x%02X".format(relayNodeIdSuffix)
+
+                                        // If relayNode is 0, just show 0x00 without trying to match
+                                        if (relayNodeId == 0) {
+                                            Text(
+                                                text = stringResource(Res.string.relayed_by, hexByte),
+                                                style = MaterialTheme.typography.labelSmall,
+                                            )
+                                        } else {
+                                            // Find all candidate nodes for non-zero relay
+                                            val nodes = nodeMap.values.toList()
+                                            val candidateRelayNodes = nodes.filter {
+                                                it.num != ourNode.num &&
+                                                    it.lastHeard != 0 &&
+                                                    (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
+                                            }
+
+                                            // Get the closest relay node
+                                            val closestRelayNode = if (candidateRelayNodes.size == 1) {
+                                                candidateRelayNodes.first()
+                                            } else {
+                                                candidateRelayNodes.minByOrNull { it.hopsAway }
+                                            }
+
+                                            // Show relay node name if found, otherwise just hex byte
+                                            closestRelayNode?.let { relayNode ->
+                                                Text(
+                                                    text = stringResource(Res.string.relayed_by, "${relayNode.user.longName} ($hexByte)"),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                )
+
+                                                // Show candidates if there are multiple
+                                                if (candidateRelayNodes.size > 1) {
+                                                    val candidateNames = candidateRelayNodes
+                                                        .sortedBy { it.hopsAway }
+                                                        .joinToString(", ") { it.user.shortName }
+                                                    Text(
+                                                        text = stringResource(Res.string.relay_candidates, candidateNames),
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                                    )
+                                                }
+                                            } ?: run {
+                                                // No candidates found, show hex byte only
+                                                Text(
+                                                    text = stringResource(Res.string.relayed_by, hexByte),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                )
+                                            }
+                                        }
+
+                                        // Show hop information only if hopsAway is meaningful (> 0)
+                                        if (message.hopsAway > 0) {
+                                            val hopText = if (message.hopStart > 0) {
+                                                stringResource(Res.string.hops_out_of_total, message.hopsAway, message.hopStart)
+                                            } else {
+                                                stringResource(Res.string.hops_away_template, message.hopsAway)
+                                            }
+                                            Text(
+                                                text = hopText,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                            )
+                                        }
+                                    }
+                                    // Show hops away without relay info (when hopsAway > 0 but no relayNode)
+                                    if (message.relayNode == null && message.hopsAway > 0) {
+                                        val hopText = if (message.hopStart > 0) {
+                                            stringResource(Res.string.hops_out_of_total, message.hopsAway, message.hopStart)
+                                        } else {
+                                            stringResource(Res.string.hops_away_template, message.hopsAway)
+                                        }
+                                        Text(
+                                            text = hopText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                        )
+                                    }
                             }
                         }
                         Spacer(modifier = Modifier.weight(1f))

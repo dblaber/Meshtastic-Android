@@ -42,6 +42,7 @@ import org.meshtastic.core.database.model.Message
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.DataPacket
+import org.meshtastic.core.datastore.UiPreferencesDataSource
 import org.meshtastic.core.prefs.ui.UiPrefs
 import org.meshtastic.core.service.MeshServiceNotifications
 import org.meshtastic.core.service.ServiceAction
@@ -65,6 +66,7 @@ constructor(
     private val packetRepository: PacketRepository,
     private val uiPrefs: UiPrefs,
     private val meshServiceNotifications: MeshServiceNotifications,
+    uiPreferencesDataSource: UiPreferencesDataSource,
 ) : ViewModel() {
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title.asStateFlow()
@@ -84,6 +86,8 @@ constructor(
 
     val contactSettings: StateFlow<Map<String, ContactSettings>> =
         packetRepository.getContactSettings().stateInWhileSubscribed(initialValue = emptyMap())
+
+    val showRelayInfo: StateFlow<Boolean> = uiPreferencesDataSource.showRelayInfo
 
     private val contactKeyForPagedMessages: MutableStateFlow<String?> = MutableStateFlow(null)
     private val pagedMessagesForContactKey: Flow<PagingData<Message>> =

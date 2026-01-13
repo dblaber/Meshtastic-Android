@@ -44,7 +44,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 configure<ApplicationExtension> {
-    namespace = configProperties.getProperty("APPLICATION_ID")
+    namespace = "com.geeksville.mesh"
 
     signingConfigs {
         create("release") {
@@ -160,11 +160,11 @@ secrets {
 androidComponents {
     onVariants(selector().all()) { variant ->
         if (variant.name == "fdroidDebug") {
-            variant.applicationId = "com.geeksville.mesh.fdroid.debug"
+            variant.applicationId = "com.geeksville.mesh.relaydev.fdroid.debug"
         }
 
         if (variant.name == "googleDebug") {
-            variant.applicationId = "com.geeksville.mesh.google.debug"
+            variant.applicationId = "com.geeksville.mesh.relaydev.google.debug"
         }
     }
     onVariants(selector().withBuildType("release")) { variant ->

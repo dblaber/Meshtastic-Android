@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.meshtastic.core.data.repository.NodeRepository
 import org.meshtastic.core.database.model.Node
+import org.meshtastic.core.datastore.UiPreferencesDataSource
 import org.meshtastic.feature.node.component.NodeMenuAction
 import javax.inject.Inject
 
@@ -34,7 +35,10 @@ constructor(
     private val nodeRepository: NodeRepository,
     private val nodeManagementActions: NodeManagementActions,
     private val nodeRequestActions: NodeRequestActions,
+    uiPreferencesDataSource: UiPreferencesDataSource,
 ) : ViewModel() {
+
+    val showRelayInfo: StateFlow<Boolean> = uiPreferencesDataSource.showRelayInfo
 
     init {
         nodeManagementActions.start(viewModelScope)
@@ -42,6 +46,7 @@ constructor(
     }
 
     val ourNodeInfo: StateFlow<Node?> = nodeRepository.ourNodeInfo
+    val nodeMap: StateFlow<Map<Int, Node>> = nodeRepository.nodeDBbyNum
 
     private val _lastTraceRouteTime = MutableStateFlow<Long?>(null)
     val lastTraceRouteTime: StateFlow<Long?> = _lastTraceRouteTime.asStateFlow()

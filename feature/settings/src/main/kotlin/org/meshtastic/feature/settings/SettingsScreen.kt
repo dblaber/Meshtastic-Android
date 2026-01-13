@@ -89,6 +89,8 @@ import org.meshtastic.core.strings.device_db_cache_limit_summary
 import org.meshtastic.core.strings.dynamic
 import org.meshtastic.core.strings.export_configuration
 import org.meshtastic.core.strings.export_data_csv
+import org.meshtastic.core.strings.show_relay_info
+import org.meshtastic.core.strings.show_relay_info_summary
 import org.meshtastic.core.strings.import_configuration
 import org.meshtastic.core.strings.intro_show
 import org.meshtastic.core.strings.location_disabled
@@ -406,6 +408,14 @@ fun SettingsScreen(
                         }
                     exportDataLauncher.launch(intent)
                 }
+
+                val showRelayInfo by settingsViewModel.showRelayInfo.collectAsStateWithLifecycle()
+                SwitchListItem(
+                    text = stringResource(Res.string.show_relay_info),
+                    leadingIcon = Icons.Rounded.Info,
+                    checked = showRelayInfo,
+                    onClick = { settingsViewModel.setShowRelayInfo(!showRelayInfo) },
+                )
 
                 ListItem(
                     text = stringResource(Res.string.intro_show),

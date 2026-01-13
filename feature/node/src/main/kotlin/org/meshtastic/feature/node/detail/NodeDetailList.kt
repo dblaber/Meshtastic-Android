@@ -76,6 +76,8 @@ fun NodeDetailContent(
     lastTracerouteTime: Long?,
     lastRequestNeighborsTime: Long?,
     availableLogs: Set<LogsType>,
+    nodeMap: Map<Int, Node>,
+    showRelayInfo: Boolean = false,
     onAction: (NodeDetailAction) -> Unit,
     onSaveNotes: (nodeNum: Int, notes: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -91,6 +93,8 @@ fun NodeDetailContent(
         lastRequestNeighborsTime = lastRequestNeighborsTime,
         ourNode = ourNode,
         metricsState = metricsState,
+        nodeMap = nodeMap,
+        showRelayInfo = showRelayInfo,
         onAction = { action ->
             if (action is NodeDetailAction.ShareContact) {
                 showShareDialog = true
@@ -113,6 +117,8 @@ fun NodeDetailList(
     lastRequestNeighborsTime: Long?,
     ourNode: Node?,
     metricsState: MetricsState,
+    nodeMap: Map<Int, Node>,
+    showRelayInfo: Boolean = false,
     onAction: (NodeDetailAction) -> Unit,
     availableLogs: Set<LogsType>,
     onSaveNotes: (Int, String) -> Unit,
@@ -157,7 +163,7 @@ fun NodeDetailList(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).focusable(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        NodeDetailsSection(node)
+        NodeDetailsSection(node = node, nodeMap = nodeMap, ourNode = ourNode, showRelayInfo = showRelayInfo)
 
         DeviceActions(
             isLocal = metricsState.isLocal,
@@ -269,6 +275,7 @@ private fun NodeDetailsPreview(@PreviewParameter(NodePreviewParameterProvider::c
             lastTracerouteTime = null,
             lastRequestNeighborsTime = null,
             metricsState = MetricsState.Companion.Empty,
+            nodeMap = emptyMap(),
             availableLogs = emptySet(),
             onAction = {},
             onSaveNotes = { _, _ -> },

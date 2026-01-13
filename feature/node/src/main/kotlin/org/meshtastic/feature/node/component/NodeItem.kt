@@ -76,6 +76,8 @@ fun NodeItem(
     onLongClick: (() -> Unit)? = null,
     connectionState: ConnectionState,
     isActive: Boolean = false,
+    nodeMap: Map<Int, Node> = emptyMap(),
+    showRelayInfo: Boolean = false,
 ) {
     val isFavorite = remember(thatNode) { thatNode.isFavorite }
     val isMuted = remember(thatNode) { thatNode.isMuted }
@@ -185,7 +187,7 @@ fun NodeItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 itemVerticalAlignment = Alignment.CenterVertically,
             ) {
-                SignalInfo(node = thatNode, isThisNode = isThisNode, contentColor = contentColor)
+                SignalInfo(node = thatNode, isThisNode = isThisNode, contentColor = contentColor, nodeMap = nodeMap, ourNode = thisNode, showRelayInfo = showRelayInfo)
             }
             val telemetryStrings = thatNode.getTelemetryStrings(tempInFahrenheit)
 

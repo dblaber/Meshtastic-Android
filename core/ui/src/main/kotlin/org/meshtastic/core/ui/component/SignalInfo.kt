@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.channel_air_util
@@ -52,6 +53,9 @@ fun SignalInfo(
     node: Node,
     isThisNode: Boolean,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    nodeMap: Map<Int, Node> = emptyMap(),
+    ourNode: Node? = null,
+    showRelayInfo: Boolean = false,
 ) {
     val text =
         if (isThisNode) {
@@ -72,9 +76,43 @@ fun SignalInfo(
                 if (node.channel > 0) {
                     add("ch:${node.channel}")
                 }
-                if (node.hopsAway != 0) add(hopsString)
+                if (node.hopsAway > 0) add(hopsString)
+
+                // Add relay node info if available (only when setting is enabled)
+                if (showRelayInfo) node.relayNode?.let { relayNodeId ->
+                    val nodes = nodeMap.values.toList()
+                    val relayNodeIdSuffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
+                    val hexByte = "0x%02X".format(relayNodeIdSuffix)
+
+                    // Find all candidate nodes
+                    val candidateRelayNodes = nodes.filter {
+                        it.num != ourNode?.num &&
+                            it.lastHeard != 0 &&
+                            (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
+                    }
+
+                    // Get the closest relay node
+                    val closestRelayNode = if (candidateRelayNodes.size == 1) {
+                        candidateRelayNodes.first()
+                    } else {
+                        candidateRelayNodes.minByOrNull { it.hopsAway }
+                    }
+
+                    closestRelayNode?.let { relayNode ->
+                        if (candidateRelayNodes.size > 1) {
+                            val candidateNames = candidateRelayNodes
+                                .sortedBy { it.hopsAway }
+                                .joinToString("/") { it.user.shortName }
+                            add("Relay: $candidateNames ($hexByte)")
+                        } else {
+                            add("Relay: ${relayNode.user.shortName} ($hexByte)")
+                        }
+                    } ?: run {
+                        add("Relay: $hexByte")
+                    }
+                }
             }
-                .joinToString(" ")
+                .joinToString(" • ")
         }
     Row(
         modifier = modifier.fillMaxWidth(),

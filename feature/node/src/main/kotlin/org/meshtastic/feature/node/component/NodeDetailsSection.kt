@@ -48,14 +48,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.details
 import org.meshtastic.core.strings.encryption_error
 import org.meshtastic.core.strings.encryption_error_text
+import org.meshtastic.core.strings.hops_out_of_total
 import org.meshtastic.core.strings.node_number
 import org.meshtastic.core.strings.node_sort_last_heard
+import org.meshtastic.core.strings.relayed_by
 import org.meshtastic.core.strings.role
 import org.meshtastic.core.strings.short_name
 import org.meshtastic.core.strings.uptime
@@ -63,7 +66,7 @@ import org.meshtastic.core.strings.user_id
 import org.meshtastic.core.ui.util.formatAgo
 
 @Composable
-fun NodeDetailsSection(node: Node, modifier: Modifier = Modifier) {
+fun NodeDetailsSection(node: Node, modifier: Modifier = Modifier, nodeMap: Map<Int, Node> = emptyMap(), ourNode: Node? = null, showRelayInfo: Boolean = false) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -85,7 +88,7 @@ fun NodeDetailsSection(node: Node, modifier: Modifier = Modifier) {
                     Spacer(Modifier.height(20.dp))
                 }
 
-                MainNodeDetails(node)
+                MainNodeDetails(node = node, nodeMap = nodeMap, ourNode = ourNode, showRelayInfo = showRelayInfo)
             }
         }
     }
@@ -124,7 +127,7 @@ private fun MismatchKeyWarning() {
 }
 
 @Composable
-private fun MainNodeDetails(node: Node) {
+private fun MainNodeDetails(node: Node, nodeMap: Map<Int, Node>, ourNode: Node?, showRelayInfo: Boolean) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             InfoItem(
@@ -176,6 +179,71 @@ private fun MainNodeDetails(node: Node) {
                 )
             } else {
                 Spacer(Modifier.weight(1f))
+            }
+        }
+
+        // Show relay information if available (only when setting is enabled)
+        if (showRelayInfo) node.relayNode?.let { relayNodeId ->
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+            val nodes = nodeMap.values.toList()
+            val relayNodeIdSuffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
+            val hexByte = "0x%02X".format(relayNodeIdSuffix)
+
+            // Find all candidate nodes
+            val candidateRelayNodes = nodes.filter {
+                it.num != ourNode?.num &&
+                    it.lastHeard != 0 &&
+                    (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
+            }
+
+            // Get the closest relay node
+            val closestRelayNode = if (candidateRelayNodes.size == 1) {
+                candidateRelayNodes.first()
+            } else {
+                candidateRelayNodes.minByOrNull { it.hopsAway }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                closestRelayNode?.let { relayNode ->
+                    val relayText = if (candidateRelayNodes.size > 1) {
+                        val candidateNames = candidateRelayNodes
+                            .sortedBy { it.hopsAway }
+                            .joinToString(", ") { it.user.shortName }
+                        "$candidateNames ($hexByte)"
+                    } else {
+                        "${relayNode.user.longName} ($hexByte)"
+                    }
+                    InfoItem(
+                        label = "Last Relay",
+                        value = relayText,
+                        icon = Icons.Default.History,
+                        modifier = Modifier.weight(1f),
+                    )
+                } ?: run {
+                    InfoItem(
+                        label = "Last Relay",
+                        value = hexByte,
+                        icon = Icons.Default.History,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                if (node.hopsAway > 0) {
+                    val hopText = if (node.hopStart > 0) {
+                        stringResource(Res.string.hops_out_of_total, node.hopsAway, node.hopStart)
+                    } else {
+                        "${node.hopsAway} hops"
+                    }
+                    InfoItem(
+                        label = "Hops",
+                        value = hopText,
+                        icon = Icons.Default.Numbers,
+                        modifier = Modifier.weight(1f),
+                    )
+                } else {
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }

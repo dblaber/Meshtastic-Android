@@ -86,6 +86,7 @@ internal data class MessageListPagedState(
     val contactKey: String,
     val firstUnreadMessageUuid: Long? = null,
     val hasUnreadMessages: Boolean = false,
+    val showRelayInfo: Boolean = false,
 )
 
 private fun MutableState<Set<Long>>.toggle(uuid: Long) {
@@ -271,6 +272,8 @@ private fun LazyItemScope.renderPagedChatMessageRow(
         ourNode = ourNode,
         message = message,
         selected = selected,
+        nodeMap = nodeMap,
+        showRelayInfo = state.showRelayInfo,
         onClick = { if (inSelectionMode) state.selectedIds.toggle(message.uuid) },
         onLongClick = {
             state.selectedIds.toggle(message.uuid)

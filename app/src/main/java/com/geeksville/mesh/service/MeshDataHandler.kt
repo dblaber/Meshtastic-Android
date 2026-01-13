@@ -605,10 +605,25 @@ constructor(
                 // Check for duplicates before inserting
                 val existingPackets = findPacketsWithId(dataPacket.id)
                 if (existingPackets.isNotEmpty()) {
-                    Logger.d {
-                        "Skipping duplicate packet: packetId=${dataPacket.id} from=${dataPacket.from} " +
-                            "to=${dataPacket.to} contactKey=$contactKey" +
-                            " (already have ${existingPackets.size} packet(s))"
+                    // Check if new packet has better relay info than existing
+                    // Treat relayNode == 0 as "no valid relay info" since proto defaults to 0
+                    val existingPacket = existingPackets.first()
+                    val existingRelayNode = existingPacket.data.relayNode?.takeIf { it > 0 }
+                    val newRelayNode = dataPacket.relayNode?.takeIf { it > 0 }
+                    val newHasBetterRelay = newRelayNode != null && existingRelayNode == null
+
+                    if (newHasBetterRelay) {
+                        // Update existing packet with better relay/hop info
+                        val updatedData = existingPacket.data.copy(
+                            relayNode = dataPacket.relayNode,
+                            hopStart = if (dataPacket.hopStart > 0) dataPacket.hopStart else existingPacket.data.hopStart,
+                            hopLimit = dataPacket.hopLimit,
+                        )
+                        val updatedPacket = existingPacket.copy(
+                            data = updatedData,
+                            hopsAway = updatedData.hopsAway,
+                        )
+                        update(updatedPacket)
                     }
                     return@handledLaunch
                 }

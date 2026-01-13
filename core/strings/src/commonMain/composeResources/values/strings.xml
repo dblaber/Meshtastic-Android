@@ -273,6 +273,8 @@
     <string name="cant_change_no_radio">Couldn't change channel, because radio is not yet connected. Please try again.</string>
     <string name="save_rangetest">Export rangetest packets</string>
     <string name="export_data_csv">Export all packets</string>
+    <string name="show_relay_info">Show relay info</string>
+    <string name="show_relay_info_summary">Display relay node and hop information on messages and nodes (useful for network debugging)</string>
     <string name="reset">Reset</string>
     <string name="scan">Scan</string>
     <string name="add_network_device">Add</string>
@@ -391,6 +393,7 @@
     <string name="logs">Logs</string>
     <string name="hops_away">Hops Away</string>
     <string name="hops_away_template">Hops Away: %1$d</string>
+    <string name="hops_out_of_total">Hops: %1$d of %2$d</string>
     <string name="info">Information</string>
     <string name="ch_util_definition">Utilization for the current channel, including well formed TX, RX and malformed RX (aka noise).</string>
     <string name="air_util_definition">Percent of airtime for transmission used within the last hour.</string>
@@ -1004,6 +1007,7 @@
     <string name="privacy_url" translatable="false">" https://meshtastic.org/docs/legal/privacy/"</string>
     <string name="unset">Unset - 0</string>
     <string name="relayed_by">Relayed by: %1$s</string>
+    <string name="relay_candidates">Candidates: %1$s</string>
     <plurals name="relays">
         <item quantity="one">Heard %1$d Relay</item>
         <item quantity="other">Heard %1$d Relays</item>

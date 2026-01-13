@@ -98,10 +98,12 @@ fun NodeListScreen(
 
     val nodes by viewModel.nodeList.collectAsStateWithLifecycle()
     val ourNode by viewModel.ourNodeInfo.collectAsStateWithLifecycle()
+    val nodeMap = remember(nodes) { nodes.associateBy { it.num } }
     val onlineNodeCount by viewModel.onlineNodeCount.collectAsStateWithLifecycle(0)
     val totalNodeCount by viewModel.totalNodeCount.collectAsStateWithLifecycle(0)
     val unfilteredNodes by viewModel.unfilteredNodeList.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
+    val showRelayInfo by viewModel.showRelayInfo.collectAsStateWithLifecycle()
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -224,6 +226,8 @@ fun NodeListScreen(
                             onLongClick = longClick,
                             connectionState = connectionState,
                             isActive = isActive,
+                            nodeMap = nodeMap,
+                            showRelayInfo = showRelayInfo,
                         )
                         val isThisNode = remember(node) { ourNode?.num == node.num }
                         if (!isThisNode) {

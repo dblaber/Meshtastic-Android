@@ -169,6 +169,7 @@ fun MessageScreen(
     val quickChatActions by viewModel.quickChatActions.collectAsStateWithLifecycle(initialValue = emptyList())
     val pagedMessages = viewModel.getMessagesFromPaged(contactKey).collectAsLazyPagingItems()
     val contactSettings by viewModel.contactSettings.collectAsStateWithLifecycle(initialValue = emptyMap())
+    val showRelayInfo by viewModel.showRelayInfo.collectAsStateWithLifecycle()
 
     // UI State managed within this Composable
     var replyingToPacketId by rememberSaveable { mutableStateOf<Int?>(null) }
@@ -357,6 +358,7 @@ fun MessageScreen(
                         contactKey = contactKey,
                         firstUnreadMessageUuid = firstUnreadMessageUuid,
                         hasUnreadMessages = hasUnreadMessages,
+                        showRelayInfo = showRelayInfo,
                     ),
                     handlers =
                     MessageListHandlers(
