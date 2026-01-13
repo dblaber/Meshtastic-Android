@@ -88,5 +88,6 @@ constructor(
 
     companion object {
         private const val MILLIS_PER_SECOND = 1000.0
+        private const val NEIGHBOR_RQ_COOLDOWN = 3 * 60 * 1000L // 3 minutes in ms
     }
 }

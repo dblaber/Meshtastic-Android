@@ -90,6 +90,7 @@ internal data class MessageListPagedState(
     val filteredCount: Int = 0,
     val showFiltered: Boolean = false,
     val filteringDisabled: Boolean = false,
+    val showRelayInfo: Boolean = false,
 )
 
 private fun MutableState<Set<Long>>.toggle(uuid: Long) {
@@ -311,6 +312,8 @@ private fun LazyItemScope.renderPagedChatMessageRow(
         message = message,
         selected = selected,
         inSelectionMode = inSelectionMode,
+        nodeMap = nodeMap,
+        showRelayInfo = state.showRelayInfo,
         onClick = { if (inSelectionMode) state.selectedIds.toggle(message.uuid) },
         onLongClick = {
             if (inSelectionMode) {

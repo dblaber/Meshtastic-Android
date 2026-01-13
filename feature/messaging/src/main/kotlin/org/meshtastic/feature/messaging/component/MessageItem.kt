@@ -61,6 +61,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.database.entity.Reaction
 import org.meshtastic.core.database.model.Message
 import org.meshtastic.core.database.model.Node
@@ -68,7 +69,10 @@ import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.util.nowMillis
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.filter_message_label
+import org.meshtastic.core.strings.hops_away_template
 import org.meshtastic.core.strings.message_delivery_status
+import org.meshtastic.core.strings.relayed_by
+import org.meshtastic.core.strings.relay_candidates
 import org.meshtastic.core.strings.reply
 import org.meshtastic.core.strings.sample_message
 import org.meshtastic.core.ui.component.AutoLinkText
@@ -99,6 +103,8 @@ internal fun MessageItem(
     message: Message,
     selected: Boolean,
     inSelectionMode: Boolean = false,
+    nodeMap: Map<Int, Node> = emptyMap(),
+    showRelayInfo: Boolean = false,
     onReply: () -> Unit = {},
     sendReaction: (String) -> Unit = {},
     onShowReactions: () -> Unit = {},
@@ -317,6 +323,69 @@ internal fun MessageItem(
                                 )
                             }
                         }
+
+                        // Show relay information (when setting is enabled)
+                        if (showRelayInfo && (message.hopsAway > 0 || message.relayNode != null)) {
+                            Column {
+                                message.relayNode?.let { relayNodeId ->
+                                    val relayNodeIdSuffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
+                                    val hexByte = "0x%02X".format(relayNodeIdSuffix)
+
+                                    if (relayNodeId == 0) {
+                                        Text(
+                                            text = stringResource(Res.string.relayed_by, hexByte),
+                                            style = MaterialTheme.typography.labelSmall,
+                                        )
+                                    } else {
+                                        val nodes = nodeMap.values.toList()
+                                        val candidateRelayNodes = nodes.filter {
+                                            it.num != ourNode.num &&
+                                                it.lastHeard != 0 &&
+                                                (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
+                                        }
+                                        val closestRelayNode = if (candidateRelayNodes.size == 1) {
+                                            candidateRelayNodes.first()
+                                        } else {
+                                            candidateRelayNodes.minByOrNull { it.hopsAway }
+                                        }
+                                        closestRelayNode?.let { relayNode ->
+                                            Text(
+                                                text = stringResource(Res.string.relayed_by, "${relayNode.user.long_name} ($hexByte)"),
+                                                style = MaterialTheme.typography.labelSmall,
+                                            )
+                                            if (candidateRelayNodes.size > 1) {
+                                                val candidateNames = candidateRelayNodes
+                                                    .sortedBy { it.hopsAway }
+                                                    .joinToString(", ") { it.user.short_name ?: "" }
+                                                Text(
+                                                    text = stringResource(Res.string.relay_candidates, candidateNames),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                                )
+                                            }
+                                        } ?: Text(
+                                            text = stringResource(Res.string.relayed_by, hexByte),
+                                            style = MaterialTheme.typography.labelSmall,
+                                        )
+                                    }
+
+                                    if (message.hopsAway > 0) {
+                                        Text(
+                                            text = stringResource(Res.string.hops_away_template, message.hopsAway),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                        )
+                                    }
+                                }
+                                if (message.relayNode == null && message.hopsAway > 0) {
+                                    Text(
+                                        text = stringResource(Res.string.hops_away_template, message.hopsAway),
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                }
+                            }
+                        }
+                    }
                     }
                     if (containsBel) {
                         Text(text = "\uD83D\uDD14", modifier = Modifier.padding(end = 4.dp))

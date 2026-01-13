@@ -183,6 +183,12 @@ constructor(
         uiPreferencesDataSource.setTheme(theme)
     }
 
+    val showRelayInfo: StateFlow<Boolean> = uiPreferencesDataSource.showRelayInfo
+
+    fun setShowRelayInfo(value: Boolean) {
+        uiPreferencesDataSource.setShowRelayInfo(value)
+    }
+
     fun showAppIntro() {
         uiPreferencesDataSource.setAppIntroCompleted(false)
     }

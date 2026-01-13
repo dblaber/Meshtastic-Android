@@ -44,6 +44,7 @@ configure<LibraryExtension> { namespace = "org.meshtastic.feature.messaging" }
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.database)
+    implementation(projects.core.datastore)
     implementation(projects.core.model)
     implementation(projects.core.prefs)
     implementation(projects.core.proto)

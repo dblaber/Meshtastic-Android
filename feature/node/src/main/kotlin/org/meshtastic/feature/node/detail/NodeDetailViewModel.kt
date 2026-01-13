@@ -43,6 +43,7 @@ import org.meshtastic.core.data.repository.RadioConfigRepository
 import org.meshtastic.core.database.entity.FirmwareRelease
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.database.model.Node
+import org.meshtastic.core.datastore.UiPreferencesDataSource
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.util.hasValidEnvironmentMetrics
@@ -104,7 +105,10 @@ constructor(
     private val deviceHardwareRepository: DeviceHardwareRepository,
     private val firmwareReleaseRepository: FirmwareReleaseRepository,
     private val serviceRepository: ServiceRepository,
+    uiPreferencesDataSource: UiPreferencesDataSource,
 ) : ViewModel() {
+
+    val showRelayInfo: StateFlow<Boolean> = uiPreferencesDataSource.showRelayInfo
 
     private val nodeIdFromRoute: Int? =
         runCatching { savedStateHandle.toRoute<NodesRoutes.NodeDetail>().destNum }

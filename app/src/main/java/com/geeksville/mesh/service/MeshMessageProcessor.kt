@@ -226,6 +226,8 @@ constructor(
                     } else {
                         packet.hop_start - packet.hop_limit
                     }
+                it.relayNode = if (packet.relayNode > 0) packet.relayNode else null
+                it.hopStart = packet.hopStart
             }
 
             try {

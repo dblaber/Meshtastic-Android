@@ -69,6 +69,8 @@ data class NodeWithRelations(
             manuallyVerified = manuallyVerified,
             nodeStatus = nodeStatus,
             lastTransport = lastTransport,
+            relayNode = relayNode,
+            hopStart = hopStart,
         )
     }
 
@@ -80,6 +82,8 @@ data class NodeWithRelations(
             snr = snr,
             rssi = rssi,
             lastHeard = lastHeard,
+            relayNode = relayNode,
+            hopStart = hopStart,
             deviceTelemetry = deviceTelemetry,
             channel = channel,
             viaMqtt = viaMqtt,
@@ -207,6 +211,8 @@ data class NodeEntity(
         notes = notes,
         nodeStatus = nodeStatus,
         lastTransport = lastTransport,
+        relayNode = relayNode,
+        hopStart = hopStart,
     )
 
     fun toNodeInfo() = NodeInfo(

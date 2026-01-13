@@ -67,6 +67,8 @@ data class Node(
     val nodeStatus: String? = null,
     /** The transport mechanism this node was last heard over (see [MeshPacket.TransportMechanism]). */
     val lastTransport: Int = 0,
+    val relayNode: Int? = null,
+    val hopStart: Int = 0,
 ) {
     val capabilities: Capabilities by lazy { Capabilities(metadata?.firmware_version) }
 
@@ -210,6 +212,8 @@ data class Node(
         manuallyVerified = manuallyVerified,
         nodeStatus = nodeStatus,
         lastTransport = lastTransport,
+        relayNode = relayNode,
+        hopStart = hopStart,
     )
 
     companion object {

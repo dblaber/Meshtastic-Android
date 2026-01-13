@@ -44,6 +44,9 @@ internal const val KEY_ONLY_ONLINE = "only-online"
 internal const val KEY_ONLY_DIRECT = "only-direct"
 internal const val KEY_SHOW_IGNORED = "show-ignored"
 
+// Debug/advanced settings
+internal const val KEY_SHOW_RELAY_INFO = "show-relay-info"
+
 @Singleton
 class UiPreferencesDataSource @Inject constructor(private val dataStore: DataStore<Preferences>) {
 
@@ -63,6 +66,9 @@ class UiPreferencesDataSource @Inject constructor(private val dataStore: DataSto
     val onlyOnline: StateFlow<Boolean> = dataStore.prefStateFlow(key = ONLY_ONLINE, default = false)
     val onlyDirect: StateFlow<Boolean> = dataStore.prefStateFlow(key = ONLY_DIRECT, default = false)
     val showIgnored: StateFlow<Boolean> = dataStore.prefStateFlow(key = SHOW_IGNORED, default = false)
+
+    // Debug/advanced settings
+    val showRelayInfo: StateFlow<Boolean> = dataStore.prefStateFlow(key = SHOW_RELAY_INFO, default = false)
 
     fun setAppIntroCompleted(completed: Boolean) {
         dataStore.setPref(key = APP_INTRO_COMPLETED, value = completed)
@@ -96,6 +102,10 @@ class UiPreferencesDataSource @Inject constructor(private val dataStore: DataSto
         dataStore.setPref(key = SHOW_IGNORED, value = value)
     }
 
+    fun setShowRelayInfo(value: Boolean) {
+        dataStore.setPref(key = SHOW_RELAY_INFO, value = value)
+    }
+
     private fun <T : Any> DataStore<Preferences>.prefStateFlow(
         key: Preferences.Key<T>,
         default: T,
@@ -115,5 +125,6 @@ class UiPreferencesDataSource @Inject constructor(private val dataStore: DataSto
         val ONLY_ONLINE = booleanPreferencesKey(KEY_ONLY_ONLINE)
         val ONLY_DIRECT = booleanPreferencesKey(KEY_ONLY_DIRECT)
         val SHOW_IGNORED = booleanPreferencesKey(KEY_SHOW_IGNORED)
+        val SHOW_RELAY_INFO = booleanPreferencesKey(KEY_SHOW_RELAY_INFO)
     }
 }
