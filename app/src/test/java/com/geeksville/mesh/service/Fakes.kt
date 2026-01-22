@@ -58,6 +58,8 @@ class FakeNodeInfoWriteDataSource : NodeInfoWriteDataSource {
 
     override suspend fun clearNodeDB(preserveFavorites: Boolean) {}
 
+    override suspend fun clearMyNodeInfo() {}
+
     override suspend fun deleteNode(num: Int) {}
 
     override suspend fun deleteNodes(nodeNums: List<Int>) {}
@@ -87,6 +89,7 @@ class FakeMeshServiceNotifications : MeshServiceNotifications {
         message: String,
         isBroadcast: Boolean,
         channelName: String?,
+        isSilent: Boolean,
     ) {}
 
     override suspend fun updateWaypointNotification(
@@ -94,6 +97,7 @@ class FakeMeshServiceNotifications : MeshServiceNotifications {
         name: String,
         message: String,
         waypointId: Int,
+        isSilent: Boolean,
     ) {}
 
     override suspend fun updateReactionNotification(
@@ -102,6 +106,7 @@ class FakeMeshServiceNotifications : MeshServiceNotifications {
         emoji: String,
         isBroadcast: Boolean,
         channelName: String?,
+        isSilent: Boolean,
     ) {}
 
     override fun showAlertNotification(contactKey: String, name: String, alert: String) {}

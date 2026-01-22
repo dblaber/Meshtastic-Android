@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Meshtastic LLC
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 @file:Suppress("TooManyFunctions")
 
 package org.meshtastic.feature.messaging
@@ -104,6 +103,7 @@ import org.meshtastic.core.database.model.Message
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.util.getChannel
+import org.meshtastic.core.service.RetryEvent
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.alert_bell_text
 import org.meshtastic.core.strings.cancel
@@ -132,6 +132,7 @@ import org.meshtastic.core.ui.component.SecurityIcon
 import org.meshtastic.core.ui.component.SharedContactDialog
 import org.meshtastic.core.ui.component.smartScrollToIndex
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.feature.messaging.component.RetryConfirmationDialog
 import org.meshtastic.proto.AppOnlyProtos
 import java.nio.charset.StandardCharsets
 
@@ -178,6 +179,24 @@ fun MessageScreen(
     val selectedMessageIds = rememberSaveable { mutableStateOf(emptySet<Long>()) }
     val messageInputState = rememberTextFieldState(message)
     val showQuickChat by viewModel.showQuickChat.collectAsStateWithLifecycle()
+
+    // Retry dialog state
+    var currentRetryEvent by remember { mutableStateOf<RetryEvent?>(null) }
+
+    // Observe retry events from the service
+    // Key on contactKey to restart collection when navigating between conversations
+    LaunchedEffect(contactKey) {
+        android.util.Log.d("MessageScreen", "Starting retry event collection for contact: $contactKey")
+        viewModel.retryEvents.collect { event ->
+            if (event != null) {
+                android.util.Log.d("MessageScreen", "Received retry event: ${event.packetId}")
+                currentRetryEvent = event
+            } else {
+                android.util.Log.d("MessageScreen", "Retry event cleared")
+                currentRetryEvent = null
+            }
+        }
+    }
 
     // Prevent the message TextField from stealing focus when the screen opens
     LaunchedEffect(contactKey) { focusManager.clearFocus() }
@@ -296,6 +315,29 @@ fun MessageScreen(
 
     sharedContact?.let { contact -> SharedContactDialog(contact = contact, onDismiss = { sharedContact = null }) }
 
+    // Show retry confirmation dialog
+    currentRetryEvent?.let { event ->
+        RetryConfirmationDialog(
+            retryEvent = event,
+            countdownSeconds = 5,
+            onConfirm = {
+                // User clicked "Retry Now" - proceed immediately
+                viewModel.respondToRetry(event.packetId, shouldRetry = true)
+                currentRetryEvent = null
+            },
+            onCancel = {
+                // User clicked "Cancel Retry" - stop retrying
+                viewModel.respondToRetry(event.packetId, shouldRetry = false)
+                currentRetryEvent = null
+            },
+            onTimeout = {
+                // Countdown reached 0 - auto-retry
+                viewModel.respondToRetry(event.packetId, shouldRetry = true)
+                currentRetryEvent = null
+            },
+        )
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -371,6 +413,7 @@ fun MessageScreen(
                         onSendMessage = { text, key -> viewModel.sendMessage(text, key) },
                         onReply = { message -> replyingToPacketId = message?.packetId },
                     ),
+                    quickEmojis = viewModel.frequentEmojis,
                 )
                 // Show FAB if we can scroll towards the newest messages (index 0).
                 if (listState.canScrollBackward) {
@@ -454,7 +497,7 @@ private fun BoxScope.ScrollToBottomFab(coroutineScope: CoroutineScope, listState
 private fun ReplySnippet(originalMessage: Message?, onClearReply: () -> Unit, ourNode: Node?) {
     AnimatedVisibility(visible = originalMessage != null) {
         originalMessage?.let { message ->
-            val isFromLocalUser = message.node.user.id == DataPacket.ID_LOCAL
+            val isFromLocalUser = message.fromLocal
             val replyingToNodeUser = if (isFromLocalUser) ourNode?.user else message.node.user
             val unknownUserText = stringResource(Res.string.unknown)
 
@@ -781,7 +824,7 @@ private fun QuickChatRow(
             // Memoize if content is static
             QuickChatAction(
                 name = "🔔",
-                message = "🔔 $alertActionMessage ", // Bell character added to message
+                message = "🔔 $alertActionMessage  ", // Bell character added to message
                 mode = QuickChatAction.Mode.Append,
                 position = -1, // Assuming -1 means it's a special prepended action
             )

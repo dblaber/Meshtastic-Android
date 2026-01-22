@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 32,
-    "identityHash": "1dd783fc9f6381cdf29035d15e7dffeb",
+    "identityHash": "9060c828fb1e93ab7316d19dd9989c0f",
     "entities": [
       {
         "tableName": "my_node",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myNodeNum` INTEGER NOT NULL, `model` TEXT, `firmwareVersion` TEXT, `couldUpdate` INTEGER NOT NULL, `shouldUpdate` INTEGER NOT NULL, `currentPacketId` INTEGER NOT NULL, `messageTimeoutMsec` INTEGER NOT NULL, `minAppVersion` INTEGER NOT NULL, `maxChannels` INTEGER NOT NULL, `hasWifi` INTEGER NOT NULL, `deviceId` TEXT, PRIMARY KEY(`myNodeNum`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myNodeNum` INTEGER NOT NULL, `model` TEXT, `firmwareVersion` TEXT, `couldUpdate` INTEGER NOT NULL, `shouldUpdate` INTEGER NOT NULL, `currentPacketId` INTEGER NOT NULL, `messageTimeoutMsec` INTEGER NOT NULL, `minAppVersion` INTEGER NOT NULL, `maxChannels` INTEGER NOT NULL, `hasWifi` INTEGER NOT NULL, `deviceId` TEXT, `pioEnv` TEXT, PRIMARY KEY(`myNodeNum`))",
         "fields": [
           {
             "fieldPath": "myNodeNum",
@@ -70,6 +70,11 @@
             "fieldPath": "deviceId",
             "columnName": "deviceId",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pioEnv",
+            "columnName": "pioEnv",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -81,7 +86,7 @@
       },
       {
         "tableName": "nodes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`num` INTEGER NOT NULL, `user` BLOB NOT NULL, `long_name` TEXT, `short_name` TEXT, `position` BLOB NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `snr` REAL NOT NULL, `rssi` INTEGER NOT NULL, `last_heard` INTEGER NOT NULL, `relay_node` INTEGER DEFAULT NULL, `hop_start` INTEGER NOT NULL DEFAULT 0, `device_metrics` BLOB NOT NULL, `channel` INTEGER NOT NULL, `via_mqtt` INTEGER NOT NULL, `hops_away` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `is_ignored` INTEGER NOT NULL DEFAULT 0, `is_muted` INTEGER NOT NULL DEFAULT 0, `environment_metrics` BLOB NOT NULL, `power_metrics` BLOB NOT NULL, `paxcounter` BLOB NOT NULL, `public_key` BLOB, `notes` TEXT NOT NULL DEFAULT '', `manually_verified` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`num`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`num` INTEGER NOT NULL, `user` BLOB NOT NULL, `long_name` TEXT, `short_name` TEXT, `position` BLOB NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `snr` REAL NOT NULL, `rssi` INTEGER NOT NULL, `last_heard` INTEGER NOT NULL, `device_metrics` BLOB NOT NULL, `channel` INTEGER NOT NULL, `via_mqtt` INTEGER NOT NULL, `hops_away` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `is_ignored` INTEGER NOT NULL DEFAULT 0, `is_muted` INTEGER NOT NULL DEFAULT 0, `environment_metrics` BLOB NOT NULL, `power_metrics` BLOB NOT NULL, `paxcounter` BLOB NOT NULL, `public_key` BLOB, `notes` TEXT NOT NULL DEFAULT '', `manually_verified` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`num`))",
         "fields": [
           {
             "fieldPath": "num",
@@ -140,19 +145,6 @@
             "columnName": "last_heard",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "relayNode",
-            "columnName": "relay_node",
-            "affinity": "INTEGER",
-            "defaultValue": "NULL"
-          },
-          {
-            "fieldPath": "hopStart",
-            "columnName": "hop_start",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
           },
           {
             "fieldPath": "deviceTelemetry",
@@ -785,7 +777,7 @@
       },
       {
         "tableName": "device_hardware",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`actively_supported` INTEGER NOT NULL, `architecture` TEXT NOT NULL, `display_name` TEXT NOT NULL, `has_ink_hud` INTEGER, `has_mui` INTEGER, `hwModel` INTEGER NOT NULL, `hw_model_slug` TEXT NOT NULL, `images` TEXT, `last_updated` INTEGER NOT NULL, `partition_scheme` TEXT, `platformio_target` TEXT NOT NULL, `requires_dfu` INTEGER, `support_level` INTEGER, `tags` TEXT, PRIMARY KEY(`hwModel`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`actively_supported` INTEGER NOT NULL, `architecture` TEXT NOT NULL, `display_name` TEXT NOT NULL, `has_ink_hud` INTEGER, `has_mui` INTEGER, `hwModel` INTEGER NOT NULL, `hw_model_slug` TEXT NOT NULL, `images` TEXT, `last_updated` INTEGER NOT NULL, `partition_scheme` TEXT, `platformio_target` TEXT NOT NULL, `requires_dfu` INTEGER, `support_level` INTEGER, `tags` TEXT, PRIMARY KEY(`platformio_target`))",
         "fields": [
           {
             "fieldPath": "activelySupported",
@@ -868,7 +860,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "hwModel"
+            "platformio_target"
           ]
         }
       },
@@ -999,7 +991,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1dd783fc9f6381cdf29035d15e7dffeb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9060c828fb1e93ab7316d19dd9989c0f')"
     ]
   }
 }

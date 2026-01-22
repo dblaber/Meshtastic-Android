@@ -43,6 +43,7 @@ import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.datastore.UiPreferencesDataSource
+import org.meshtastic.core.prefs.emoji.CustomEmojiPrefs
 import org.meshtastic.core.prefs.ui.UiPrefs
 import org.meshtastic.core.service.MeshServiceNotifications
 import org.meshtastic.core.service.ServiceAction
@@ -65,6 +66,7 @@ constructor(
     private val serviceRepository: ServiceRepository,
     private val packetRepository: PacketRepository,
     private val uiPrefs: UiPrefs,
+    private val customEmojiPrefs: CustomEmojiPrefs,
     private val meshServiceNotifications: MeshServiceNotifications,
     uiPreferencesDataSource: UiPreferencesDataSource,
 ) : ViewModel() {
@@ -89,12 +91,26 @@ constructor(
 
     val showRelayInfo: StateFlow<Boolean> = uiPreferencesDataSource.showRelayInfo
 
+    val retryEvents = serviceRepository.retryEvents
+
     private val contactKeyForPagedMessages: MutableStateFlow<String?> = MutableStateFlow(null)
     private val pagedMessagesForContactKey: Flow<PagingData<Message>> =
         contactKeyForPagedMessages
             .filterNotNull()
             .flatMapLatest { contactKey -> packetRepository.getMessagesFromPaged(contactKey, ::getNode) }
             .cachedIn(viewModelScope)
+
+    val frequentEmojis: List<String>
+        get() =
+            customEmojiPrefs.customEmojiFrequency
+                ?.split(",")
+                ?.associate { entry ->
+                    entry.split("=", limit = 2).takeIf { it.size == 2 }?.let { it[0] to it[1].toInt() } ?: ("" to 0)
+                }
+                ?.toList()
+                ?.sortedByDescending { it.second }
+                ?.map { it.first }
+                ?.take(6) ?: listOf("👍", "👎", "😂", "🔥", "❤️", "😮")
 
     init {
         val contactKey = savedStateHandle.get<String>("contactKey")
@@ -220,5 +236,9 @@ constructor(
         } catch (ex: RemoteException) {
             Logger.e { "Send DataPacket error: ${ex.message}" }
         }
+    }
+
+    fun respondToRetry(packetId: Int, shouldRetry: Boolean) {
+        serviceRepository.respondToRetry(packetId, shouldRetry)
     }
 }

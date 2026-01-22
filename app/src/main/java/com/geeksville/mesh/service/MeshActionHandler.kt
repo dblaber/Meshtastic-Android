@@ -18,6 +18,7 @@ package com.geeksville.mesh.service
 
 import com.geeksville.mesh.concurrent.handledLaunch
 import com.geeksville.mesh.util.ignoreException
+import com.google.protobuf.ByteString
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -202,9 +203,9 @@ constructor(
         commandSender.sendAdmin(myNodeNum, requestId) { removeByNodenum = nodeNum }
     }
 
-    fun handleSetRemoteOwner(id: Int, payload: ByteArray, myNodeNum: Int) {
+    fun handleSetRemoteOwner(id: Int, destNum: Int, payload: ByteArray) {
         val u = MeshProtos.User.parseFrom(payload)
-        commandSender.sendAdmin(myNodeNum, id) { setOwner = u }
+        commandSender.sendAdmin(destNum, id) { setOwner = u }
     }
 
     fun handleGetRemoteOwner(id: Int, destNum: Int) {
@@ -216,9 +217,9 @@ constructor(
         commandSender.sendAdmin(myNodeNum) { setConfig = c }
     }
 
-    fun handleSetRemoteConfig(id: Int, num: Int, payload: ByteArray) {
+    fun handleSetRemoteConfig(id: Int, destNum: Int, payload: ByteArray) {
         val c = ConfigProtos.Config.parseFrom(payload)
-        commandSender.sendAdmin(num, id) { setConfig = c }
+        commandSender.sendAdmin(destNum, id) { setConfig = c }
     }
 
     fun handleGetRemoteConfig(id: Int, destNum: Int, config: Int) {
@@ -231,9 +232,9 @@ constructor(
         }
     }
 
-    fun handleSetModuleConfig(id: Int, num: Int, payload: ByteArray) {
+    fun handleSetModuleConfig(id: Int, destNum: Int, payload: ByteArray) {
         val c = ModuleConfigProtos.ModuleConfig.parseFrom(payload)
-        commandSender.sendAdmin(num, id) { setModuleConfig = c }
+        commandSender.sendAdmin(destNum, id) { setModuleConfig = c }
     }
 
     fun handleGetModuleConfig(id: Int, destNum: Int, config: Int) {
@@ -263,10 +264,10 @@ constructor(
         }
     }
 
-    fun handleSetRemoteChannel(id: Int, num: Int, payload: ByteArray?) {
+    fun handleSetRemoteChannel(id: Int, destNum: Int, payload: ByteArray?) {
         if (payload != null) {
             val c = ChannelProtos.Channel.parseFrom(payload)
-            commandSender.sendAdmin(num, id) { setChannel = c }
+            commandSender.sendAdmin(destNum, id) { setChannel = c }
         }
     }
 
@@ -278,16 +279,16 @@ constructor(
         commandSender.requestNeighborInfo(requestId, destNum)
     }
 
-    fun handleBeginEditSettings(myNodeNum: Int) {
-        commandSender.sendAdmin(myNodeNum) { beginEditSettings = true }
+    fun handleBeginEditSettings(destNum: Int) {
+        commandSender.sendAdmin(destNum) { beginEditSettings = true }
     }
 
-    fun handleCommitEditSettings(myNodeNum: Int) {
-        commandSender.sendAdmin(myNodeNum) { commitEditSettings = true }
+    fun handleCommitEditSettings(destNum: Int) {
+        commandSender.sendAdmin(destNum) { commitEditSettings = true }
     }
 
-    fun handleRebootToDfu(myNodeNum: Int) {
-        commandSender.sendAdmin(myNodeNum) { enterDfuModeRequest = true }
+    fun handleRebootToDfu(destNum: Int) {
+        commandSender.sendAdmin(destNum) { enterDfuModeRequest = true }
     }
 
     fun handleRequestTelemetry(requestId: Int, destNum: Int, type: Int) {
@@ -300,6 +301,16 @@ constructor(
 
     fun handleRequestReboot(requestId: Int, destNum: Int) {
         commandSender.sendAdmin(destNum, requestId) { rebootSeconds = DEFAULT_REBOOT_DELAY }
+    }
+
+    fun handleRequestRebootOta(requestId: Int, destNum: Int, mode: Int, hash: ByteArray?) {
+        val otaMode = AdminProtos.OTAMode.forNumber(mode) ?: AdminProtos.OTAMode.NO_REBOOT_OTA
+        val otaEventBuilder = AdminProtos.AdminMessage.OTAEvent.newBuilder()
+        otaEventBuilder.rebootOtaMode = otaMode
+        if (hash != null) {
+            otaEventBuilder.otaHash = ByteString.copyFrom(hash)
+        }
+        commandSender.sendAdmin(destNum, requestId) { otaRequest = otaEventBuilder.build() }
     }
 
     fun handleRequestFactoryReset(requestId: Int, destNum: Int) {

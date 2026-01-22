@@ -300,7 +300,6 @@
     <string name="device_config">Пристрій</string>
     <string name="role">Роль пристрою</string>
     <string name="time_zone">Часовий пояс</string>
-    <string name="display_config">Дисплей</string>
     <string name="flip_screen">Перевернути екран</string>
     <string name="display_units">Одиниці виміру</string>
     <string name="oled_type">Тип OLED</string>
@@ -433,6 +432,8 @@
     <string name="unknown_channel">Невідомий канал</string>
     <string name="advanced_title">Розширені</string>
     <string name="clean_node_database_title">Очистити базу даних вузлів</string>
+    <string name="clean_unknown_nodes">Очистити лише невідомі вузли</string>
+    <string name="clean_now">Очистити зараз</string>
     <string name="clean_node_database_confirmation">Це призведе до вилучення %1$d вузлів з вашої бази даних. Цю дію не можна скасувати.</string>
     <!-- INSECURE_NO_PRECISE State (Yellow Open Lock) -->
     <!-- INSECURE_PRECISE_ONLY State (Red Open Lock) -->
@@ -496,18 +497,15 @@
     <string name="learn_more">Докладніше</string>
     <string name="usb_devices">USB пристрої</string>
     <!-- Firmware Update -->
-    <string name="firmware_update_title">Оновлення прошивки</string>
+    <string name="firmware_update_title">Оновити прошивку</string>
     <string name="firmware_update_checking">Перевірка наявності оновлень...</string>
     <string name="firmware_update_device">Пристрій: %1$s</string>
-    <string name="firmware_update_latest">Останній реліз: %1$s</string>
     <string name="firmware_update_stable">Стабільна</string>
     <string name="firmware_update_alpha">Альфа</string>
     <string name="firmware_update_disconnect_warning">Примітка: це тимчасово від'єднає ваш пристрій на час оновлення.</string>
-    <string name="firmware_update_downloading">Завантаження прошивки... %1$d%</string>
     <string name="firmware_update_error">Помилка: %1$s</string>
     <string name="firmware_update_retry">Повторити спробу</string>
     <string name="firmware_update_success">Оновлення успішне!</string>
-    <string name="firmware_update_updating">Оновлення... %1$s%</string>
     <string name="firmware_update_unknown_hardware">Невідома модель обладнання: %1$d</string>
     <string name="firmware_update_no_device">Немає під'єднаних пристроїв</string>
     <string name="firmware_update_not_found_in_release">Не вдалося знайти прошивку %1$s в релізі.</string>
@@ -517,7 +515,9 @@
     <string name="firmware_update_almost_there">Майже готово...</string>
     <string name="firmware_update_taking_a_while">Це може зайняти хвилинку...</string>
     <string name="firmware_update_select_file">Вибрати локальний файл</string>
+    <string name="firmware_update_channel_name">Оновити прошивку</string>
     <string name="interval_unset">Скинути</string>
     <!-- Compass -->
     <string name="now">Зараз</string>
+    <string name="add_channels_title">Додайте канали</string>
 </resources>

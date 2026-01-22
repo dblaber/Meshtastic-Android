@@ -52,6 +52,7 @@ import org.meshtastic.core.service.ServiceRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@Suppress("TooManyFunctions", "LargeClass")
 class MeshService : Service() {
 
     @Inject lateinit var radioInterfaceService: RadioInterfaceService
@@ -133,7 +134,7 @@ class MeshService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val a = radioInterfaceService.getBondedDeviceAddress()
+        val a = radioInterfaceService.getDeviceAddress()
         val wantForeground = a != null && a != NO_DEVICE_SELECTED
 
         val notification = connectionManager.updateStatusNotification()
@@ -158,11 +159,18 @@ class MeshService : Service() {
             return START_NOT_STICKY
         }
         return if (!wantForeground) {
+            Logger.i { "Stopping mesh service because no device is selected" }
             ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+            stopSelf()
             START_NOT_STICKY
         } else {
             START_STICKY
         }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Logger.i { "Mesh service: onTaskRemoved" }
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
@@ -170,6 +178,7 @@ class MeshService : Service() {
     override fun onDestroy() {
         Logger.i { "Destroying mesh service" }
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        serviceRepository.cancelPendingRetries()
         serviceJob.cancel()
         super.onDestroy()
     }
@@ -202,8 +211,8 @@ class MeshService : Service() {
                 router.actionHandler.handleSetOwner(u, myNodeNum)
             }
 
-            override fun setRemoteOwner(id: Int, payload: ByteArray) = toRemoteExceptions {
-                router.actionHandler.handleSetRemoteOwner(id, payload, myNodeNum)
+            override fun setRemoteOwner(id: Int, destNum: Int, payload: ByteArray) = toRemoteExceptions {
+                router.actionHandler.handleSetRemoteOwner(id, destNum, payload)
             }
 
             override fun getRemoteOwner(id: Int, destNum: Int) = toRemoteExceptions {
@@ -266,12 +275,12 @@ class MeshService : Service() {
                 router.actionHandler.handleGetRemoteChannel(id, destNum, index)
             }
 
-            override fun beginEditSettings() = toRemoteExceptions {
-                router.actionHandler.handleBeginEditSettings(myNodeNum)
+            override fun beginEditSettings(destNum: Int) = toRemoteExceptions {
+                router.actionHandler.handleBeginEditSettings(destNum)
             }
 
-            override fun commitEditSettings() = toRemoteExceptions {
-                router.actionHandler.handleCommitEditSettings(myNodeNum)
+            override fun commitEditSettings(destNum: Int) = toRemoteExceptions {
+                router.actionHandler.handleCommitEditSettings(destNum)
             }
 
             override fun getChannelSet(): ByteArray = toRemoteExceptions {
@@ -324,7 +333,9 @@ class MeshService : Service() {
                 router.actionHandler.handleRequestReboot(requestId, destNum)
             }
 
-            override fun rebootToDfu() = toRemoteExceptions { router.actionHandler.handleRebootToDfu(myNodeNum) }
+            override fun rebootToDfu(destNum: Int) = toRemoteExceptions {
+                router.actionHandler.handleRebootToDfu(destNum)
+            }
 
             override fun requestFactoryReset(requestId: Int, destNum: Int) = toRemoteExceptions {
                 router.actionHandler.handleRequestFactoryReset(requestId, destNum)
@@ -342,5 +353,10 @@ class MeshService : Service() {
             override fun requestTelemetry(requestId: Int, destNum: Int, type: Int) = toRemoteExceptions {
                 router.actionHandler.handleRequestTelemetry(requestId, destNum, type)
             }
+
+            override fun requestRebootOta(requestId: Int, destNum: Int, mode: Int, hash: ByteArray?) =
+                toRemoteExceptions {
+                    router.actionHandler.handleRequestRebootOta(requestId, destNum, mode, hash)
+                }
         }
 }
