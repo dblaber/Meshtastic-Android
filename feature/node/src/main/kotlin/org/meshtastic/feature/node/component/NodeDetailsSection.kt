@@ -182,8 +182,9 @@ private fun MainNodeDetails(node: Node, nodeMap: Map<Int, Node>, ourNode: Node?,
             }
         }
 
-        // Show relay information if available (only when setting is enabled)
-        if (showRelayInfo) node.relayNode?.let { relayNodeId ->
+        // Show relay information if available (only when setting is enabled and node was relayed)
+        // Direct nodes (hopsAway == 0) already show SNR/RSSI which implies direct connection
+        if (showRelayInfo && node.hopsAway > 0) node.relayNode?.let { relayNodeId ->
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
             val nodes = nodeMap.values.toList()
@@ -197,18 +198,24 @@ private fun MainNodeDetails(node: Node, nodeMap: Map<Int, Node>, ourNode: Node?,
                     (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
             }
 
-            // Get the closest relay node
-            val closestRelayNode = if (candidateRelayNodes.size == 1) {
+            // Get the best relay node candidate using signal quality (SNR/RSSI)
+            // Higher SNR is better, less negative RSSI is better
+            val bestRelayNode = if (candidateRelayNodes.size == 1) {
                 candidateRelayNodes.first()
             } else {
-                candidateRelayNodes.minByOrNull { it.hopsAway }
+                candidateRelayNodes.maxByOrNull { candidate ->
+                    // Combine SNR and RSSI for scoring - SNR weighted more heavily
+                    // SNR typically ranges from -20 to +10, RSSI from -120 to -30
+                    (candidate.snr * 3) + (candidate.rssi + 120)
+                }
             }
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                closestRelayNode?.let { relayNode ->
+                bestRelayNode?.let { relayNode ->
                     val relayText = if (candidateRelayNodes.size > 1) {
+                        // Sort candidates by signal quality (best first)
                         val candidateNames = candidateRelayNodes
-                            .sortedBy { it.hopsAway }
+                            .sortedByDescending { (it.snr * 3) + (it.rssi + 120) }
                             .joinToString(", ") { it.user.shortName }
                         "$candidateNames ($hexByte)"
                     } else {

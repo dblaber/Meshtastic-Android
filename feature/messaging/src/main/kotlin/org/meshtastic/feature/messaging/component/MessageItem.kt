@@ -273,8 +273,9 @@ internal fun MessageItem(
                     color = cardColors.contentColor,
                 )
 
-                // Show relay information for both received and sent messages (when heard back)
-                if (showRelayInfo && (message.hopsAway > 0 || message.relayNode != null)) {
+                // Show relay information for relayed messages only (hopsAway > 0)
+                // Direct messages (hopsAway == 0) already show SNR/RSSI which implies direct connection
+                if (showRelayInfo && message.hopsAway > 0) {
                     Column {
                         message.relayNode?.let { relayNodeId ->
                             val relayNodeIdSuffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
@@ -295,24 +296,29 @@ internal fun MessageItem(
                                         (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
                                 }
 
-                                // Get the closest relay node
-                                val closestRelayNode = if (candidateRelayNodes.size == 1) {
+                                // Get the best relay node candidate using signal quality (SNR/RSSI)
+                                // Higher SNR is better, less negative RSSI is better
+                                val bestRelayNode = if (candidateRelayNodes.size == 1) {
                                     candidateRelayNodes.first()
                                 } else {
-                                    candidateRelayNodes.minByOrNull { it.hopsAway }
+                                    candidateRelayNodes.maxByOrNull { candidate ->
+                                        // Combine SNR and RSSI for scoring - SNR weighted more heavily
+                                        // SNR typically ranges from -20 to +10, RSSI from -120 to -30
+                                        (candidate.snr * 3) + (candidate.rssi + 120)
+                                    }
                                 }
 
                                 // Show relay node name if found, otherwise just hex byte
-                                closestRelayNode?.let { relayNode ->
+                                bestRelayNode?.let { relayNode ->
                                     Text(
                                         text = stringResource(Res.string.relayed_by, "${relayNode.user.longName} ($hexByte)"),
                                         style = MaterialTheme.typography.labelSmall,
                                     )
 
-                                    // Show candidates if there are multiple
+                                    // Show candidates if there are multiple, sorted by signal quality
                                     if (candidateRelayNodes.size > 1) {
                                         val candidateNames = candidateRelayNodes
-                                            .sortedBy { it.hopsAway }
+                                            .sortedByDescending { (it.snr * 3) + (it.rssi + 120) }
                                             .joinToString(", ") { it.user.shortName }
                                         Text(
                                             text = stringResource(Res.string.relay_candidates, candidateNames),
@@ -328,33 +334,19 @@ internal fun MessageItem(
                                     )
                                 }
                             }
+                        }
 
-                            // Show hop information only if hopsAway is meaningful (> 0)
-                            if (message.hopsAway > 0) {
-                                val hopText = if (message.hopStart > 0) {
-                                    stringResource(Res.string.hops_out_of_total, message.hopsAway, message.hopStart)
-                                } else {
-                                    stringResource(Res.string.hops_away_template, message.hopsAway)
-                                }
-                                Text(
-                                    text = hopText,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                )
-                            }
+                        // Show hop information
+                        val hopText = if (message.hopStart > 0) {
+                            stringResource(Res.string.hops_out_of_total, message.hopsAway, message.hopStart)
+                        } else {
+                            stringResource(Res.string.hops_away_template, message.hopsAway)
                         }
-                        // Show hops away without relay info (when hopsAway > 0 but no relayNode)
-                        if (message.relayNode == null && message.hopsAway > 0) {
-                            val hopText = if (message.hopStart > 0) {
-                                stringResource(Res.string.hops_out_of_total, message.hopsAway, message.hopStart)
-                            } else {
-                                stringResource(Res.string.hops_away_template, message.hopsAway)
-                            }
-                            Text(
-                                text = hopText,
-                                style = MaterialTheme.typography.labelSmall,
-                            )
-                        }
+                        Text(
+                            text = hopText,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        )
                     }
                 }
 

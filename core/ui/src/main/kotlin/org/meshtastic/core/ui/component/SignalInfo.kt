@@ -78,8 +78,9 @@ fun SignalInfo(
                 }
                 if (node.hopsAway > 0) add(hopsString)
 
-                // Add relay node info if available (only when setting is enabled)
-                if (showRelayInfo) node.relayNode?.let { relayNodeId ->
+                // Add relay node info if available (only when setting is enabled and node was relayed)
+                // Direct nodes (hopsAway == 0) already show SNR/RSSI which implies direct connection
+                if (showRelayInfo && node.hopsAway > 0) node.relayNode?.let { relayNodeId ->
                     val nodes = nodeMap.values.toList()
                     val relayNodeIdSuffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
                     val hexByte = "0x%02X".format(relayNodeIdSuffix)
@@ -91,17 +92,21 @@ fun SignalInfo(
                             (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == relayNodeIdSuffix
                     }
 
-                    // Get the closest relay node
-                    val closestRelayNode = if (candidateRelayNodes.size == 1) {
+                    // Get the best relay node candidate using signal quality (SNR/RSSI)
+                    val bestRelayNode = if (candidateRelayNodes.size == 1) {
                         candidateRelayNodes.first()
                     } else {
-                        candidateRelayNodes.minByOrNull { it.hopsAway }
+                        candidateRelayNodes.maxByOrNull { candidate ->
+                            // Combine SNR and RSSI for scoring - SNR weighted more heavily
+                            (candidate.snr * 3) + (candidate.rssi + 120)
+                        }
                     }
 
-                    closestRelayNode?.let { relayNode ->
+                    bestRelayNode?.let { relayNode ->
                         if (candidateRelayNodes.size > 1) {
+                            // Sort candidates by signal quality (best first)
                             val candidateNames = candidateRelayNodes
-                                .sortedBy { it.hopsAway }
+                                .sortedByDescending { (it.snr * 3) + (it.rssi + 120) }
                                 .joinToString("/") { it.user.shortName }
                             add("Relay: $candidateNames ($hexByte)")
                         } else {
