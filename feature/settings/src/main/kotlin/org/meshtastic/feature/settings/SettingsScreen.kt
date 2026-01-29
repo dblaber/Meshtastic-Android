@@ -100,6 +100,7 @@ import org.meshtastic.core.strings.preferences_language
 import org.meshtastic.core.strings.provide_location_to_mesh
 import org.meshtastic.core.strings.remotely_administrating
 import org.meshtastic.core.strings.save_rangetest
+import org.meshtastic.core.strings.show_relay_info
 import org.meshtastic.core.strings.system_settings
 import org.meshtastic.core.strings.theme
 import org.meshtastic.core.strings.theme_dark
@@ -317,6 +318,14 @@ fun SettingsScreen(
                         enabled = !isGpsDisabled,
                         checked = provideLocation,
                         onClick = { settingsViewModel.setProvideLocation(!provideLocation) },
+                    )
+
+                    val showRelayInfo by settingsViewModel.showRelayInfo.collectAsStateWithLifecycle()
+                    SwitchListItem(
+                        text = stringResource(Res.string.show_relay_info),
+                        leadingIcon = Icons.Rounded.Output,
+                        checked = showRelayInfo,
+                        onClick = { settingsViewModel.setShowRelayInfo(!showRelayInfo) },
                     )
 
                     val settingsLauncher =

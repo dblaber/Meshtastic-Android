@@ -62,8 +62,6 @@ data class NodeWithRelations(
             paxcounter = paxcounter,
             notes = notes,
             manuallyVerified = manuallyVerified,
-            relayNode = relayNode,
-            hopStart = hopStart,
             nodeStatus = nodeStatus,
         )
     }
@@ -76,8 +74,6 @@ data class NodeWithRelations(
             snr = snr,
             rssi = rssi,
             lastHeard = lastHeard,
-            relayNode = relayNode,
-            hopStart = hopStart,
             deviceTelemetry = deviceTelemetry,
             channel = channel,
             viaMqtt = viaMqtt,
@@ -127,8 +123,6 @@ data class NodeEntity(
     var snr: Float = Float.MAX_VALUE,
     var rssi: Int = Int.MAX_VALUE,
     @ColumnInfo(name = "last_heard") var lastHeard: Int = 0, // the last time we've seen this node in secs since 1970
-    @ColumnInfo(name = "relay_node", defaultValue = "NULL") var relayNode: Int? = null,
-    @ColumnInfo(name = "hop_start", defaultValue = "0") var hopStart: Int = 0,
     @ColumnInfo(name = "device_metrics", typeAffinity = ColumnInfo.BLOB)
     var deviceTelemetry: TelemetryProtos.Telemetry = TelemetryProtos.Telemetry.getDefaultInstance(),
     var channel: Int = 0,
@@ -203,8 +197,6 @@ data class NodeEntity(
         paxcounter = paxcounter,
         publicKey = publicKey ?: user.publicKey,
         notes = notes,
-        relayNode = relayNode,
-        hopStart = hopStart,
         nodeStatus = nodeStatus,
     )
 

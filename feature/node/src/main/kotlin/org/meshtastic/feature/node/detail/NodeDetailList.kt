@@ -161,7 +161,7 @@ fun NodeDetailList(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).focusable(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        NodeDetailsSection(node = node, nodeMap = nodeMap, ourNode = ourNode, showRelayInfo = showRelayInfo)
+        NodeDetailsSection(node = node)
 
         DeviceActions(
             isLocal = metricsState.isLocal,

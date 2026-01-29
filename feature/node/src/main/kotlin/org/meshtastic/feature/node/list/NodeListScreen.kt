@@ -226,8 +226,6 @@ fun NodeListScreen(
                             onLongClick = longClick,
                             connectionState = connectionState,
                             isActive = isActive,
-                            nodeMap = nodeMap,
-                            showRelayInfo = showRelayInfo,
                         )
                         val isThisNode = remember(node) { ourNode?.num == node.num }
                         if (!isThisNode) {
