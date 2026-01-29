@@ -39,6 +39,7 @@ import org.meshtastic.proto.MeshProtos
 import org.meshtastic.proto.MeshProtos.MeshPacket
 import org.meshtastic.proto.Portnums
 import org.meshtastic.proto.TelemetryProtos
+import org.meshtastic.proto.paxcount
 import org.meshtastic.proto.position
 import org.meshtastic.proto.telemetry
 import java.util.concurrent.ConcurrentHashMap
@@ -99,7 +100,7 @@ constructor(
         sessionPasskey.set(key)
     }
 
-    private fun getHopLimit(): Int = localConfig.value.lora.hopLimit.takeIf { it > 0 } ?: DEFAULT_HOP_LIMIT
+    private fun computeHopLimit(): Int = localConfig.value.lora.hopLimit.takeIf { it > 0 } ?: DEFAULT_HOP_LIMIT
 
     private fun getAdminChannelIndex(toNum: Int): Int {
         val myNum = nodeManager?.myNodeNum ?: return 0
@@ -146,7 +147,7 @@ constructor(
             newMeshPacketTo(p.to ?: DataPacket.ID_BROADCAST).buildMeshPacket(
                 id = p.id,
                 wantAck = p.wantAck,
-                hopLimit = if (p.hopLimit > 0) p.hopLimit else getHopLimit(),
+                hopLimit = if (p.hopLimit > 0) p.hopLimit else computeHopLimit(),
                 channel = p.channel,
             ) {
                 portnumValue = p.dataType
@@ -272,23 +273,39 @@ constructor(
 
     fun requestTelemetry(requestId: Int, destNum: Int, typeValue: Int) {
         val type = TelemetryType.entries.getOrNull(typeValue) ?: TelemetryType.DEVICE
-        val telemetryRequest = telemetry {
-            when (type) {
-                TelemetryType.ENVIRONMENT ->
-                    environmentMetrics = TelemetryProtos.EnvironmentMetrics.getDefaultInstance()
-                TelemetryType.AIR_QUALITY -> airQualityMetrics = TelemetryProtos.AirQualityMetrics.getDefaultInstance()
-                TelemetryType.POWER -> powerMetrics = TelemetryProtos.PowerMetrics.getDefaultInstance()
-                TelemetryType.LOCAL_STATS -> localStats = TelemetryProtos.LocalStats.getDefaultInstance()
-                TelemetryType.DEVICE -> deviceMetrics = TelemetryProtos.DeviceMetrics.getDefaultInstance()
-            }
+
+        val portNum: Portnums.PortNum
+        val payloadBytes: ByteString
+
+        if (type == TelemetryType.PAX) {
+            portNum = Portnums.PortNum.PAXCOUNTER_APP
+            payloadBytes = paxcount {}.toByteString()
+        } else {
+            portNum = Portnums.PortNum.TELEMETRY_APP
+            payloadBytes =
+                telemetry {
+                    when (type) {
+                        TelemetryType.ENVIRONMENT ->
+                            environmentMetrics = TelemetryProtos.EnvironmentMetrics.getDefaultInstance()
+                        TelemetryType.AIR_QUALITY ->
+                            airQualityMetrics = TelemetryProtos.AirQualityMetrics.getDefaultInstance()
+                        TelemetryType.POWER -> powerMetrics = TelemetryProtos.PowerMetrics.getDefaultInstance()
+                        TelemetryType.LOCAL_STATS -> localStats = TelemetryProtos.LocalStats.getDefaultInstance()
+                        TelemetryType.DEVICE -> deviceMetrics = TelemetryProtos.DeviceMetrics.getDefaultInstance()
+                        TelemetryType.HOST -> hostMetrics = TelemetryProtos.HostMetrics.getDefaultInstance()
+                        else -> {}
+                    }
+                }
+                    .toByteString()
         }
+
         packetHandler?.sendToRadio(
             newMeshPacketTo(destNum).buildMeshPacket(
                 id = requestId,
                 channel = nodeManager?.nodeDBbyNodeNum?.get(destNum)?.channel ?: 0,
             ) {
-                portnumValue = Portnums.PortNum.TELEMETRY_APP_VALUE
-                payload = telemetryRequest.toByteString()
+                portnumValue = portNum.number
+                payload = payloadBytes
                 wantResponse = true
             },
         )
@@ -378,7 +395,9 @@ constructor(
     ): MeshPacket {
         this.id = id
         this.wantAck = wantAck
-        this.hopLimit = if (hopLimit > 0) hopLimit else getHopLimit()
+        val actualHopLimit = if (hopLimit > 0) hopLimit else computeHopLimit()
+        this.hopLimit = actualHopLimit
+        this.hopStart = actualHopLimit
         this.priority = priority
 
         if (channel == DataPacket.PKC_CHANNEL_INDEX) {

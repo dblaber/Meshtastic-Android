@@ -26,6 +26,7 @@ import co.touchlab.kermit.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
@@ -47,6 +48,7 @@ import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.DataPacket
+import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.TracerouteMapAvailability
 import org.meshtastic.core.model.evaluateTracerouteMapAvailability
 import org.meshtastic.core.navigation.NodesRoutes
@@ -55,9 +57,11 @@ import org.meshtastic.core.service.ServiceRepository
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.fallback_node_name
 import org.meshtastic.core.ui.util.toPosition
+import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.map.model.TracerouteOverlay
+import org.meshtastic.feature.node.detail.NodeRequestActions
+import org.meshtastic.feature.node.detail.NodeRequestEffect
 import org.meshtastic.feature.node.model.MetricsState
-import org.meshtastic.feature.node.model.TimeFrame
 import org.meshtastic.proto.ConfigProtos.Config
 import org.meshtastic.proto.MeshProtos
 import org.meshtastic.proto.MeshProtos.MeshPacket
@@ -90,6 +94,7 @@ constructor(
     private val tracerouteSnapshotRepository: TracerouteSnapshotRepository,
     private val deviceHardwareRepository: DeviceHardwareRepository,
     private val firmwareReleaseRepository: FirmwareReleaseRepository,
+    private val nodeRequestActions: NodeRequestActions,
 ) : ViewModel() {
     private var destNum: Int? =
         runCatching { savedStateHandle.toRoute<NodesRoutes.NodeDetailGraph>().destNum }.getOrNull()
@@ -99,6 +104,9 @@ constructor(
     private val tracerouteOverlayCache = MutableStateFlow<Map<Int, TracerouteOverlay>>(emptyMap())
 
     private fun MeshLog.hasValidTraceroute(): Boolean =
+        with(fromRadio.packet) { hasDecoded() && decoded.wantResponse && from == 0 && to == destNum }
+
+    private fun MeshLog.hasValidNeighborInfo(): Boolean =
         with(fromRadio.packet) { hasDecoded() && decoded.wantResponse && from == 0 && to == destNum }
 
     /**
@@ -192,8 +200,39 @@ constructor(
     private val _environmentState = MutableStateFlow(EnvironmentMetricsState())
     val environmentState: StateFlow<EnvironmentMetricsState> = _environmentState
 
-    private val _timeFrame = MutableStateFlow(TimeFrame.TWENTY_FOUR_HOURS)
-    val timeFrame: StateFlow<TimeFrame> = _timeFrame
+    val effects: SharedFlow<NodeRequestEffect> = nodeRequestActions.effects
+
+    val lastTraceRouteTime: StateFlow<Long?> =
+        nodeRequestActions.lastTracerouteTimes.map { it[destNum] }.stateInWhileSubscribed(null)
+
+    val lastRequestNeighborsTime: StateFlow<Long?> =
+        nodeRequestActions.lastRequestNeighborTimes.map { it[destNum] }.stateInWhileSubscribed(null)
+
+    fun requestUserInfo() {
+        destNum?.let { nodeRequestActions.requestUserInfo(viewModelScope, it, state.value.node?.user?.longName ?: "") }
+    }
+
+    fun requestPosition() {
+        destNum?.let { nodeRequestActions.requestPosition(viewModelScope, it, state.value.node?.user?.longName ?: "") }
+    }
+
+    fun requestTelemetry(type: TelemetryType) {
+        destNum?.let {
+            nodeRequestActions.requestTelemetry(viewModelScope, it, state.value.node?.user?.longName ?: "", type)
+        }
+    }
+
+    fun requestTraceroute() {
+        destNum?.let {
+            nodeRequestActions.requestTraceroute(viewModelScope, it, state.value.node?.user?.longName ?: "")
+        }
+    }
+
+    fun requestNeighborInfo() {
+        destNum?.let {
+            nodeRequestActions.requestNeighborInfo(viewModelScope, it, state.value.node?.user?.longName ?: "")
+        }
+    }
 
     init {
         initializeFlows()
@@ -301,6 +340,21 @@ constructor(
                     }
 
                     launch {
+                        combine(
+                            meshLogRepository.getLogsFrom(nodeNum = 0, PortNum.NEIGHBORINFO_APP_VALUE),
+                            meshLogRepository.getLogsFrom(currentDestNum, PortNum.NEIGHBORINFO_APP_VALUE),
+                        ) { request, response ->
+                            _state.update { state ->
+                                state.copy(
+                                    neighborInfoRequests = request.filter { it.hasValidNeighborInfo() },
+                                    neighborInfoResults = response,
+                                )
+                            }
+                        }
+                            .collect {}
+                    }
+
+                    launch {
                         meshLogRepository.getMeshPacketsFrom(
                             currentDestNum,
                             PortNum.POSITION_APP_VALUE,
@@ -359,10 +413,6 @@ constructor(
     override fun onCleared() {
         super.onCleared()
         Logger.d { "MetricsViewModel cleared" }
-    }
-
-    fun setTimeFrame(timeFrame: TimeFrame) {
-        _timeFrame.value = timeFrame
     }
 
     /** Write the persisted Position data out to a CSV file in the specified location. */

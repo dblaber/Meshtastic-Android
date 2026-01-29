@@ -82,6 +82,8 @@ object NodeDetailRoutes {
     @Serializable data class HostMetricsLog(val destNum: Int) : Route
 
     @Serializable data class PaxMetrics(val destNum: Int) : Route
+
+    @Serializable data class NeighborInfoLog(val destNum: Int) : Route
 }
 
 object SettingsRoutes {
@@ -141,6 +143,8 @@ object SettingsRoutes {
 
     @Serializable data object Paxcounter : Route
 
+    @Serializable data object StatusMessage : Route
+
     // endregion
 
     // region advanced config routes
@@ -150,6 +154,8 @@ object SettingsRoutes {
     @Serializable data object DebugPanel : Route
 
     @Serializable data object About : Route
+
+    @Serializable data object FilterSettings : Route
 
     // endregion
 }

@@ -65,6 +65,7 @@
     <string name="rebroadcast_mode_none_desc">Sèlman pèmèt pou wòl SENSOR, TRACKER ak TAK_TRACKER, sa a ap entèdi tout rebroadcasts, pa diferan de wòl CLIENT_MUTE.</string>
     <string name="rebroadcast_mode_core_portnums_only_desc">Ignoré pakè soti nan portnum ki pa estanda tankou: TAK, RangeTest, PaxCounter, elatriye. Sèlman rebroadcast pakè ak portnum estanda: NodeInfo, Tèks, Pozisyon, Telemetri, ak Routing.</string>
     <!-- Position Config -->
+    <string name="channel">kanal</string>
     <string name="channel_name">Non kanal</string>
     <string name="qr_code">Kòd QR</string>
     <string name="unknown_username">Non itilizatè enkoni</string>
@@ -198,17 +199,12 @@
     <string name="encryption_psk">Kle Pataje</string>
     <string name="encryption_pkc">Chifreman Kle Piblik</string>
     <string name="encryption_error">Pa matche kle piblik</string>
-    <string name="encryption_error_text">Kle piblik la pa matche ak kle anrejistre a. Ou ka retire nœud la e kite li echanje kle ankò, men sa ka endike yon pwoblèm sekirite pi grav. Kontakte itilizatè a atravè yon lòt chanèl ki fè konfyans, pou detèmine si chanjman kle a te fèt akòz yon reyajisteman faktori oswa lòt aksyon entansyonèl.</string>
     <string name="meshtastic_new_nodes_notifications">Notifikasyon nouvo nœud</string>
     <string name="more_details">Plis detay</string>
     <string name="snr_definition">Rapò Siynal sou Bri, yon mezi ki itilize nan kominikasyon pou mezire nivo siynal vle a kont nivo bri ki nan anviwònman an. Nan Meshtastic ak lòt sistèm san fil, yon SNR pi wo endike yon siynal pi klè ki ka amelyore fyab ak kalite transmisyon done.</string>
     <string name="rssi_definition">Endikatè Fòs Siynal Resevwa, yon mezi ki itilize pou detèmine nivo pouvwa siynal ki resevwa pa antèn nan. Yon RSSI pi wo jeneralman endike yon koneksyon pi fò ak plis estab.</string>
     <string name="iaq_definition">(Kalite Lèy Entèryè) echèl relatif valè IAQ jan li mezire pa Bosch BME680. Ranje valè 0–500.</string>
-    <string name="device_metrics_log">Jounal Metik Aparèy</string>
     <string name="node_map">Kat Nœud</string>
-    <string name="position_log">Jounal Pozisyon</string>
-    <string name="env_metrics_log">Jounal Metik Anviwònman</string>
-    <string name="sig_metrics_log">Jounal Metik Siynal</string>
     <string name="administration">Administrasyon</string>
     <string name="remote_admin">Administrasyon Remote</string>
     <string name="bad">Move</string>
@@ -217,7 +213,6 @@
     <string name="none_quality">Pa gen</string>
     <string name="signal">Siynal</string>
     <string name="signal_quality">Kalite Siynal</string>
-    <string name="traceroute_log">Jounal Traceroute</string>
     <string name="traceroute_direct">Direk</string>
     <string name="traceroute_diff">Hops vèsus %1$d Hops tounen %2$d</string>
     <string name="region_frequency_plan">Rejyon</string>
@@ -235,4 +230,5 @@
     <string name="firmware_update_failed">Mizajou echwe</string>
     <string name="interval_unset">Pa konfigire</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

@@ -26,11 +26,13 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.CleaningServices
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.SystemUpdate
+import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -143,13 +145,13 @@ fun RadioConfigItemList(
 
             ListItem(
                 text = stringResource(Res.string.import_configuration),
-                leadingIcon = Icons.Default.Download,
+                leadingIcon = Icons.Rounded.Download,
                 enabled = enabled,
                 onClick = onImport,
             )
             ListItem(
                 text = stringResource(Res.string.export_configuration),
-                leadingIcon = Icons.Default.Upload,
+                leadingIcon = Icons.Rounded.Upload,
                 enabled = enabled,
                 onClick = onExport,
             )
@@ -206,33 +208,35 @@ fun RadioConfigItemList(
         }
     }
 
-    TitledCard(title = stringResource(Res.string.advanced_title), modifier = Modifier.padding(top = 16.dp)) {
-        if (isManaged) {
-            ManagedMessage()
-        }
+    if (state.isLocal) {
+        TitledCard(title = stringResource(Res.string.advanced_title), modifier = Modifier.padding(top = 16.dp)) {
+            if (isManaged) {
+                ManagedMessage()
+            }
 
-        if (isOtaCapable && state.isLocal) {
+            if (isOtaCapable) {
+                ListItem(
+                    text = stringResource(Res.string.firmware_update_title),
+                    leadingIcon = Icons.Rounded.SystemUpdate,
+                    enabled = enabled,
+                    onClick = { onNavigate(FirmwareRoutes.FirmwareUpdate) },
+                )
+            }
+
             ListItem(
-                text = stringResource(Res.string.firmware_update_title),
-                leadingIcon = Icons.Rounded.SystemUpdate,
+                text = stringResource(Res.string.clean_node_database_title),
+                leadingIcon = Icons.Rounded.CleaningServices,
                 enabled = enabled,
-                onClick = { onNavigate(FirmwareRoutes.FirmwareUpdate) },
+                onClick = { onNavigate(SettingsRoutes.CleanNodeDb) },
+            )
+
+            ListItem(
+                text = stringResource(Res.string.debug_panel),
+                leadingIcon = Icons.Rounded.BugReport,
+                enabled = enabled,
+                onClick = { onNavigate(SettingsRoutes.DebugPanel) },
             )
         }
-
-        ListItem(
-            text = stringResource(Res.string.clean_node_database_title),
-            leadingIcon = Icons.Rounded.CleaningServices,
-            enabled = enabled,
-            onClick = { onNavigate(SettingsRoutes.CleanNodeDb) },
-        )
-
-        ListItem(
-            text = stringResource(Res.string.debug_panel),
-            leadingIcon = Icons.Rounded.BugReport,
-            enabled = enabled,
-            onClick = { onNavigate(SettingsRoutes.DebugPanel) },
-        )
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Meshtastic LLC
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.node.component
 
 import androidx.compose.foundation.layout.Arrangement
@@ -30,14 +29,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.SocialDistance
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.SocialDistance
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +43,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -60,6 +56,9 @@ import org.meshtastic.feature.node.model.LogsType
 import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.feature.node.model.NodeDetailAction
 import org.meshtastic.proto.ConfigProtos.Config.DisplayConfig.DisplayUnits
+
+private const val EXCHANGE_BUTTON_WEIGHT = 1.1f
+private const val COMPASS_BUTTON_WEIGHT = 0.9f
 
 /**
  * Displays node position details, last update time, distance, and related actions like requesting position and
@@ -76,28 +75,19 @@ fun PositionSection(
 ) {
     val distance = ourNode?.distance(node)?.takeIf { it > 0 }?.toDistanceString(metricsState.displayUnits)
     val hasValidPosition = node.latitude != 0.0 || node.longitude != 0.0
-    ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        shape = MaterialTheme.shapes.extraLarge,
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(Res.string.position),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-            )
+    val isLocal = metricsState.isLocal
 
-            Spacer(Modifier.height(16.dp))
-
+    SectionCard(title = Res.string.position, modifier = modifier) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             if (hasValidPosition) {
                 PositionMap(node, distance)
                 LinkedCoordinatesItem(node, metricsState.displayUnits)
                 Spacer(Modifier.height(8.dp))
             }
 
-            PositionActionButtons(node, hasValidPosition, metricsState.displayUnits, onAction)
+            if (!isLocal) {
+                PositionActionButtons(node, hasValidPosition, metricsState.displayUnits, onAction)
+            }
 
             if (availableLogs.contains(LogsType.NODE_MAP) || availableLogs.contains(LogsType.POSITIONS)) {
                 Spacer(Modifier.height(12.dp))
@@ -145,7 +135,7 @@ private fun PositionMap(node: Node, distance: String?) {
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Default.SocialDistance, null, Modifier.size(16.dp))
+                    Icon(Icons.Rounded.SocialDistance, null, Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
                     Text(distance, style = MaterialTheme.typography.labelLarge)
                 }
@@ -168,7 +158,7 @@ private fun PositionActionButtons(
     ) {
         Button(
             onClick = { onAction(NodeDetailAction.HandleNodeMenuAction(NodeMenuAction.RequestPosition(node))) },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(EXCHANGE_BUTTON_WEIGHT),
             shape = MaterialTheme.shapes.large,
             colors =
             ButtonDefaults.buttonColors(
@@ -176,20 +166,30 @@ private fun PositionActionButtons(
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
         ) {
-            Icon(Icons.Default.LocationOn, null, Modifier.size(20.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(text = stringResource(Res.string.exchange_position), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Icon(Icons.Rounded.LocationOn, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = stringResource(Res.string.exchange_position),
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Visible,
+            )
         }
 
         if (hasValidPosition) {
             FilledTonalButton(
                 onClick = { onAction(NodeDetailAction.OpenCompass(node, displayUnits)) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(COMPASS_BUTTON_WEIGHT),
                 shape = MaterialTheme.shapes.large,
             ) {
-                Icon(Icons.Default.Explore, null, Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(text = stringResource(Res.string.open_compass), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Icon(Icons.Rounded.Explore, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = stringResource(Res.string.open_compass),
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }

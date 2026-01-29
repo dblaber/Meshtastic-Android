@@ -66,7 +66,7 @@ dependencyResolutionManagement {
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver") version "1.0.0"
-    id("com.gradle.develocity") version("4.3.1")
+    id("com.gradle.develocity") version("4.3.2")
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
 }
 
@@ -81,16 +81,16 @@ develocity {
         local {
             isEnabled = true
         }
-//        remote(HttpBuildCache::class.java) {
-//            isAllowInsecureProtocol = true
-//            // Replace with your selfhosted instance address
-//            // see: https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_setup_http_backend
-//            url = uri("http://<your-build-cache-ip-here>:5071/cache/")
-//
-//            // Allow this machine to upload results to the cache
-//            isPush = true
-//
-//        }
+        remote(HttpBuildCache::class.java) {
+            isAllowInsecureProtocol = true
+            // Replace with your selfhosted instance address
+            // see: https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_setup_http_backend
+            url = uri("http://192.168.1.3:5071/cache/")
+
+            // Allow this machine to upload results to the cache
+            isPush = true
+
+        }
     }
 }
 

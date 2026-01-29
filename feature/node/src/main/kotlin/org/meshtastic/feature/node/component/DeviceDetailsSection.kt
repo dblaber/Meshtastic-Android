@@ -28,13 +28,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Router
+import androidx.compose.material.icons.rounded.Router
 import androidx.compose.material.icons.twotone.Verified
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +41,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -56,7 +51,6 @@ import org.meshtastic.core.strings.device
 import org.meshtastic.core.strings.hardware
 import org.meshtastic.core.strings.supported
 import org.meshtastic.core.strings.supported_by_community
-import org.meshtastic.core.ui.component.InsetDivider
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusRed
@@ -67,21 +61,9 @@ fun DeviceDetailsSection(state: MetricsState, modifier: Modifier = Modifier) {
     val node = state.node ?: return
     val deviceHardware = state.deviceHardware ?: return
 
-    ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = colorScheme.surfaceContainerHigh),
-        shape = MaterialTheme.shapes.extraLarge,
-    ) {
+    SectionCard(title = Res.string.device, modifier = modifier) {
         SelectionContainer {
-            Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                Text(
-                    text = stringResource(Res.string.device),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-
+            Column {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -90,19 +72,19 @@ fun DeviceDetailsSection(state: MetricsState, modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                InsetDivider()
+                SectionDivider()
                 val deviceText =
                     state.reportedTarget?.let { target -> "${deviceHardware.displayName} ($target)" }
                         ?: deviceHardware.displayName
                 ListItem(
                     text = stringResource(Res.string.hardware),
-                    leadingIcon = Icons.Default.Router,
+                    leadingIcon = Icons.Rounded.Router,
                     supportingText = deviceText,
                     copyable = true,
                     trailingIcon = null,
                 )
 
-                InsetDivider()
+                SectionDivider()
 
                 SupportStatusItem(deviceHardware.activelySupported)
             }

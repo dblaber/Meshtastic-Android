@@ -27,6 +27,7 @@
     <string name="routing_error_bad_request">Εσφαλμένο Αίτημα</string>
     <string name="routing_error_pki_unknown_pubkey">Άγνωστο Δημόσιο Κλειδί</string>
     <!-- Position Config -->
+    <string name="channel">Κανάλι</string>
     <string name="channel_name">Όνομα Καναλιού</string>
     <string name="qr_code">Κώδικας QR</string>
     <string name="unknown_username">Άγνωστο Όνομα Χρήστη</string>
@@ -141,9 +142,10 @@
     <string name="encryption_psk">Κοινόχρηστο Κλειδί</string>
     <string name="encryption_pkc">Κρυπτογράφηση Δημόσιου Κλειδιού</string>
     <string name="encryption_error">Ασυμφωνία δημόσιου κλειδιού</string>
-    <string name="position_log">Αρχείο Καταγραφής Τοποθεσίας</string>
+    <string name="position_log">Τοποθεσία</string>
     <string name="administration">Διαχείριση</string>
     <string name="remote_admin">Απομακρυσμένη Διαχείριση</string>
+    <string name="traceroute_log">Traceroute</string>
     <string name="copy">Αντιγραφή</string>
     <string name="favorite">Αγαπημένο</string>
     <string name="channel_1">Κανάλι 1</string>
@@ -207,4 +209,5 @@
     <string name="firmware_update_failed">Αποτυχία ενημέρωσης</string>
     <string name="interval_unset">Αναίρεση</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

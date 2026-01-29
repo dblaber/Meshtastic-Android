@@ -109,14 +109,28 @@
     <string name="label_short_fast">Krátky Dosah -  Rýchlo</string>
     <string name="label_short_slow">Krátky Dosah - Pomali</string>
     <!-- Position Config -->
+    <string name="position_packet">Paket Pozície</string>
+    <string name="broadcast_interval">Broadcastový Interval</string>
+    <string name="smart_position">Inteligentná poloha</string>
+    <string name="minimum_interval">Minimálny Interval</string>
+    <string name="minimum_distance">Minimálna vzdialenosť</string>
+    <string name="device_gps">GPS Zariadenia</string>
+    <string name="fixed_position">Fixná Pozícia</string>
+    <string name="altitude">Nadmorská výška</string>
+    <string name="update_interval">Aktualizačný interval</string>
+    <string name="gpio">GPIO</string>
+    <string name="debug">Ladenie</string>
+    <string name="channel">Kanál</string>
     <string name="channel_name">Názov kanála</string>
     <string name="qr_code">QR kód</string>
     <string name="unknown_username">Neznáme užívateľské meno</string>
     <string name="send">Odoslať</string>
     <string name="warning_not_paired">K tomuto telefónu ste ešte nespárovali žiadne zariadenie kompatibilné s Meshtastic. Prosím spárujte zariadenie a nastavte svoje užívateľské meno.\n\nTáto open-source aplikácia je v alpha testovacej fáze, ak nájdete chybu, prosím popíšte ju na fóre: https://github.com/orgs/meshtastic/discussions\n\n Pre viac informácií navštívte web stránku - www.meshtastic.org.</string>
     <string name="you">Vy</string>
+    <string name="analytics_okay">Povoliť posielanie analytiky a chybových hlásení.</string>
     <string name="accept">Prijať</string>
     <string name="cancel">Odmietnuť</string>
+    <string name="discard_changes">Vymazať</string>
     <string name="save_changes">Uložiť</string>
     <string name="new_channel_rcvd">Prijatá nová URL kanálu</string>
     <string name="report_bug">Nahlásiť chybu</string>
@@ -132,8 +146,13 @@
     <string name="connected_count">Pripojený: %1$s online</string>
     <string name="ip_address">IP adresa:</string>
     <string name="ip_port">Port:</string>
+    <string name="connected">Pripojený</string>
     <string name="connected_to">Pripojené k vysielaču (%1$s)</string>
+    <string name="wifi_ip">Wifi IP:</string>
+    <string name="ethernet_ip">Eternet IP:</string>
+    <string name="connecting">Prebieha pripájanie</string>
     <string name="not_connected">Nepripojené</string>
+    <string name="no_device_selected">Nebolo vybrané žiadne zariadenie</string>
     <string name="connected_sleeping">Pripojené k uspanému vysielaču</string>
     <string name="app_too_old">Aplikáciu je potrebné aktualizovať</string>
     <string name="must_update">Musíte aktualizovať aplikáciu na Google Play store (alebo z Github). Je príliš stará pre komunikáciu s touto verziou firmvéru vysielača. Viac informácií k tejto téme nájdete na <a href="https://meshtastic.org/docs/software/android/installation">Meshtastic docs</a>.</string>
@@ -141,6 +160,28 @@
     <string name="meshtastic_service_notifications">Notifikácie zo služby</string>
     <string name="channel_invalid">URL adresa tohoto kanála nie je platná a nedá sa použiť</string>
     <string name="debug_panel">Debug okno</string>
+    <plurals name="log_retention_hours">
+        <item quantity="one">%1$d hodina</item>
+        <item quantity="few">%1$d hodiny</item>
+        <item quantity="many">%1$d hodín</item>
+        <item quantity="other">%1$d hodín</item>
+    </plurals>
+    <plurals name="log_retention_days_quantity">
+        <item quantity="one">%1$d deň</item>
+        <item quantity="few">%1$d dni</item>
+        <item quantity="many">%1$d dní</item>
+        <item quantity="other">%1$d dní</item>
+    </plurals>
+    <string name="debug_filters">Filtre</string>
+    <string name="debug_active_filters">Aktívne filtre</string>
+    <string name="debug_default_search">Hľadať v záznamoch…</string>
+    <string name="debug_search_next">Ďalšia zhoda</string>
+    <string name="debug_search_prev">Predošlá zhoda</string>
+    <string name="debug_search_clear">Vymazať vyhľadávanie</string>
+    <string name="debug_filter_add">Pridať filter</string>
+    <string name="debug_filter_clear">Vymazať všetky filtre</string>
+    <string name="debug_filter_add_custom">Pridať vlastný filter</string>
+    <string name="debug_filter_preset_title">Prednastavené filtre</string>
     <string name="clear">Zmazať</string>
     <string name="message_delivery_status">Stav doručenia správy</string>
     <string name="meshtastic_alerts_notifications">Notifikácie upozornení</string>
@@ -249,8 +290,6 @@
     <string name="encryption_psk">Zdieľaný kľúč</string>
     <string name="encryption_pkc">Šifrovanie verejného kľúča</string>
     <string name="encryption_error">Nezhoda verejného kľúča</string>
-    <string name="encryption_error_text">Verejný kľúč sa nezhoduje so zaznamenaným kľúčom. Môžete odstrániť uzol a nechať ho znova vymeniť kľúče, ale to môže naznačovať vážnejší bezpečnostný problém. Kontaktujte používateľa prostredníctvom iného dôveryhodného kanála a zistite, či bola zmena kľúča spôsobená obnovením továrenských nastavení alebo inou úmyselnou akciou.</string>
-    <string name="exchange_userinfo">Vymeniť si používateľské informácie</string>
     <string name="meshtastic_new_nodes_notifications">Notifikácie nových uzlov</string>
     <string name="more_details">Viac detailov</string>
     <string name="snr">SNR</string>
@@ -258,11 +297,8 @@
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">Indikátor sily prijímaného signálu (RSSI), meranie používané na určenie úrovne výkonu prijatého skrz anténu. Vyššia hodnota RSSI vo všeobecnosti znamená silnejšie a stabilnejšie pripojenie.</string>
     <string name="iaq_definition">(Kvalita vzduchu v interiéri) relatívna hodnota IAQ meraná prístrojom Bosch BME680. Rozsah hodnôt 0–500.</string>
-    <string name="device_metrics_log">Log metrík zariadenia</string>
     <string name="node_map">Mapa uzlov</string>
-    <string name="position_log">Log pozície</string>
-    <string name="env_metrics_log">Log poveternostných metrík</string>
-    <string name="sig_metrics_log">Log metrík signálu</string>
+    <string name="position_log">Pozícia</string>
     <string name="administration">Administrácia</string>
     <string name="remote_admin">Administrácia na diaľku</string>
     <string name="bad">Zlý</string>
@@ -272,7 +308,7 @@
     <string name="share_to">Zdieľať…</string>
     <string name="signal">Signál</string>
     <string name="signal_quality">Kvalita signálu</string>
-    <string name="traceroute_log">Log trasovania</string>
+    <string name="traceroute_log">Trasovanie</string>
     <string name="traceroute_direct">Priamo</string>
     <plurals name="traceroute_hops">
         <item quantity="one">1 skok</item>
@@ -294,7 +330,6 @@
     <string name="favorite">Obľúbený</string>
     <string name="favorite_add">Pridať '%1$s', ako obľúbený uzol?</string>
     <string name="favorite_remove">Odstrániť '%1$s' obľúbený uzol?</string>
-    <string name="power_metrics_log">Záznamník výkonu</string>
     <string name="channel_1">Kanál 1</string>
     <string name="channel_2">Kanál 2</string>
     <string name="channel_3">Kanál 3</string>
@@ -424,4 +459,5 @@
     <string name="firmware_update_failed">Aktualizácia zlyhala</string>
     <string name="interval_unset">Nenastavené</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

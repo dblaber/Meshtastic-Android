@@ -109,26 +109,34 @@ constructor(
      */
     private var isStarted = false
 
-    private fun initStateListeners() {
-        bluetoothRepository.state
-            .onEach { state ->
-                if (state.enabled) {
-                    startInterface()
-                } else if (radioIf is NordicBleInterface) {
-                    stopInterface()
-                }
-            }
-            .launchIn(processLifecycle.coroutineScope)
+    @Volatile private var listenersInitialized = false
 
-        networkRepository.networkAvailable
-            .onEach { state ->
-                if (state) {
-                    startInterface()
-                } else if (radioIf is TCPInterface) {
-                    stopInterface()
+    private fun initStateListeners() {
+        if (listenersInitialized) return
+        synchronized(this) {
+            if (listenersInitialized) return
+            listenersInitialized = true
+
+            bluetoothRepository.state
+                .onEach { state ->
+                    if (state.enabled) {
+                        startInterface()
+                    } else if (radioIf is NordicBleInterface) {
+                        stopInterface()
+                    }
                 }
-            }
-            .launchIn(processLifecycle.coroutineScope)
+                .launchIn(processLifecycle.coroutineScope)
+
+            networkRepository.networkAvailable
+                .onEach { state ->
+                    if (state) {
+                        startInterface()
+                    } else if (radioIf is TCPInterface) {
+                        stopInterface()
+                    }
+                }
+                .launchIn(processLifecycle.coroutineScope)
+        }
     }
 
     companion object {
@@ -257,7 +265,8 @@ constructor(
     /** Start our configured interface (if it isn't already running) */
     private fun startInterface() {
         if (radioIf !is NopInterface) {
-            Logger.w { "Can't start interface - $radioIf is already running" }
+            // Already running
+            return
         } else {
             val address = getBondedDeviceAddress()
             if (address == null) {

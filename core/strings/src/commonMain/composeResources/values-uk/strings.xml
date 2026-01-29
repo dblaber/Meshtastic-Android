@@ -73,6 +73,7 @@
     <string name="altitude">Висота</string>
     <string name="update_interval">Частота оновлення</string>
     <string name="gpio">GPIO</string>
+    <string name="channel">Канал</string>
     <string name="channel_name">Ім'я каналу</string>
     <string name="qr_code">QR код</string>
     <string name="unknown_username">Невідомий користувач</string>
@@ -246,13 +247,13 @@
     <string name="share_to">Поділитися з…</string>
     <string name="signal">Сигнал</string>
     <string name="signal_quality">Якість сигналу</string>
+    <string name="traceroute_log">Маршрут</string>
     <string name="max">Макс</string>
     <string name="copy">Копіювати</string>
     <string name="favorite">Обране</string>
     <string name="remove_favorite">Видалити з обраних</string>
     <string name="favorite_add">Додати '%1$s' як обраний вузол?</string>
     <string name="favorite_remove">Видалити '%1$s' з обраних вузлів?</string>
-    <string name="power_metrics_log">Журнал енергетичних метрик</string>
     <string name="channel_1">Канал 1</string>
     <string name="channel_2">Канал 2</string>
     <string name="channel_3">Канал 3</string>
@@ -520,4 +521,5 @@
     <!-- Compass -->
     <string name="now">Зараз</string>
     <string name="add_channels_title">Додайте канали</string>
+    <!-- Message Filter -->
 </resources>

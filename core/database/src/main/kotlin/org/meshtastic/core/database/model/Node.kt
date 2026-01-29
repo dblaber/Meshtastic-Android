@@ -57,6 +57,7 @@ data class Node(
     val manuallyVerified: Boolean = false,
     val relayNode: Int? = null,
     val hopStart: Int = 0,
+    val nodeStatus: String? = null,
 ) {
     val capabilities: Capabilities by lazy { Capabilities(metadata?.firmwareVersion) }
 

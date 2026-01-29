@@ -36,6 +36,7 @@
     <string name="role_client">Cliente</string>
     <string name="role_client_desc">Aplicación conectada ou dispositivo de mensaxería autónomo.</string>
     <!-- Position Config -->
+    <string name="channel">Canle</string>
     <string name="channel_name">Nome de canle</string>
     <string name="qr_code">Código QR</string>
     <string name="unknown_username">Nome de usuario descoñecido</string>
@@ -156,6 +157,7 @@
     <string name="mute_8_hours">8 horas</string>
     <string name="mute_1_week">1 semana</string>
     <string name="mute_always">Sempre</string>
+    <string name="traceroute_log">Traza-ruta</string>
     <string name="region_frequency_plan">Rexión</string>
     <string name="distance">Distancia</string>
     <!-- INSECURE_NO_PRECISE State (Yellow Open Lock) -->
@@ -170,4 +172,5 @@
     <string name="firmware_update_failed">Actualización fallou</string>
     <string name="interval_unset">Sen configurar</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

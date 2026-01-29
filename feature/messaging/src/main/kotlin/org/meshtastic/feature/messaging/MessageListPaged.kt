@@ -88,6 +88,9 @@ internal data class MessageListPagedState(
     val firstUnreadMessageUuid: Long? = null,
     val hasUnreadMessages: Boolean = false,
     val showRelayInfo: Boolean = false,
+    val filteredCount: Int = 0,
+    val showFiltered: Boolean = false,
+    val filteringDisabled: Boolean = false,
 )
 
 private fun MutableState<Set<Long>>.toggle(uuid: Long) {

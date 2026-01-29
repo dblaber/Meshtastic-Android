@@ -33,6 +33,7 @@
     <string name="routing_error_too_large">Paket je prevelik</string>
     <string name="routing_error_no_response">Nema odgovora</string>
     <!-- Position Config -->
+    <string name="channel">Kanal</string>
     <string name="channel_name">Naziv kanala</string>
     <string name="qr_code">QR kod</string>
     <string name="unknown_username">Nepoznati korisnik</string>
@@ -150,6 +151,7 @@
     <string name="mute_8_hours">8 sati</string>
     <string name="mute_1_week">1 tjedan</string>
     <string name="mute_always">Uvijek</string>
+    <string name="traceroute_log">Traceroute</string>
     <string name="audio">Zvuk</string>
     <string name="audio_config">Postavke Zvuka</string>
     <string name="bluetooth_config">Postavke Bluetootha</string>
@@ -170,4 +172,5 @@
     <string name="firmware_update_failed">Ažuriranje neuspjelo</string>
     <string name="interval_unset">Nepostavljeno</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

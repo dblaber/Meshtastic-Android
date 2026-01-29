@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Meshtastic LLC
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.node.model
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChargingStation
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.Power
-import androidx.compose.material.icons.filled.Route
-import androidx.compose.material.icons.filled.SignalCellularAlt
-import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.rounded.ChargingStation
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.material.icons.rounded.Memory
+import androidx.compose.material.icons.rounded.Power
+import androidx.compose.material.icons.rounded.SignalCellularAlt
+import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.navigation.NodeDetailRoutes
@@ -35,21 +33,26 @@ import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.device_metrics_log
 import org.meshtastic.core.strings.env_metrics_log
 import org.meshtastic.core.strings.host_metrics_log
+import org.meshtastic.core.strings.neighbor_info
 import org.meshtastic.core.strings.node_map
 import org.meshtastic.core.strings.pax_metrics_log
 import org.meshtastic.core.strings.position_log
 import org.meshtastic.core.strings.power_metrics_log
-import org.meshtastic.core.strings.sig_metrics_log
+import org.meshtastic.core.strings.signal_quality
 import org.meshtastic.core.strings.traceroute_log
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Paxcount
+import org.meshtastic.core.ui.icon.Route
 
 enum class LogsType(val titleRes: StringResource, val icon: ImageVector, val routeFactory: (Int) -> Route) {
-    DEVICE(Res.string.device_metrics_log, Icons.Default.ChargingStation, { NodeDetailRoutes.DeviceMetrics(it) }),
-    NODE_MAP(Res.string.node_map, Icons.Default.Map, { NodeDetailRoutes.NodeMap(it) }),
-    POSITIONS(Res.string.position_log, Icons.Default.LocationOn, { NodeDetailRoutes.PositionLog(it) }),
-    ENVIRONMENT(Res.string.env_metrics_log, Icons.Default.Thermostat, { NodeDetailRoutes.EnvironmentMetrics(it) }),
-    SIGNAL(Res.string.sig_metrics_log, Icons.Default.SignalCellularAlt, { NodeDetailRoutes.SignalMetrics(it) }),
-    POWER(Res.string.power_metrics_log, Icons.Default.Power, { NodeDetailRoutes.PowerMetrics(it) }),
-    TRACEROUTE(Res.string.traceroute_log, Icons.Default.Route, { NodeDetailRoutes.TracerouteLog(it) }),
-    HOST(Res.string.host_metrics_log, Icons.Default.Memory, { NodeDetailRoutes.HostMetricsLog(it) }),
-    PAX(Res.string.pax_metrics_log, Icons.Default.People, { NodeDetailRoutes.PaxMetrics(it) }),
+    DEVICE(Res.string.device_metrics_log, Icons.Rounded.ChargingStation, { NodeDetailRoutes.DeviceMetrics(it) }),
+    NODE_MAP(Res.string.node_map, Icons.Rounded.Map, { NodeDetailRoutes.NodeMap(it) }),
+    POSITIONS(Res.string.position_log, Icons.Rounded.LocationOn, { NodeDetailRoutes.PositionLog(it) }),
+    ENVIRONMENT(Res.string.env_metrics_log, Icons.Rounded.Thermostat, { NodeDetailRoutes.EnvironmentMetrics(it) }),
+    SIGNAL(Res.string.signal_quality, Icons.Rounded.SignalCellularAlt, { NodeDetailRoutes.SignalMetrics(it) }),
+    POWER(Res.string.power_metrics_log, Icons.Rounded.Power, { NodeDetailRoutes.PowerMetrics(it) }),
+    TRACEROUTE(Res.string.traceroute_log, MeshtasticIcons.Route, { NodeDetailRoutes.TracerouteLog(it) }),
+    NEIGHBOR_INFO(Res.string.neighbor_info, Icons.Rounded.Groups, { NodeDetailRoutes.NeighborInfoLog(it) }),
+    HOST(Res.string.host_metrics_log, Icons.Rounded.Memory, { NodeDetailRoutes.HostMetricsLog(it) }),
+    PAX(Res.string.pax_metrics_log, MeshtasticIcons.Paxcount, { NodeDetailRoutes.PaxMetrics(it) }),
 }

@@ -25,6 +25,7 @@
     <string name="node_sort_distance">מרחק</string>
     <string name="node_sort_hops_away">דלג קדימה</string>
     <!-- Position Config -->
+    <string name="channel">ערוץ</string>
     <string name="channel_name">שם הערוץ</string>
     <string name="qr_code">קוד QR</string>
     <string name="unknown_username">שם המשתמש אינו מוכר</string>
@@ -138,6 +139,7 @@
     <string name="waypoint_new">נקודת ציון חדשה</string>
     <string name="waypoint_received">התקבל נקודת ציון: %1$s</string>
     <string name="error_duty_cycle">הגעת לרף ה-duty cycle. לא ניתן לשלוח הודעות כרגע, בבקשה נסה שוב מאוחר יותר.</string>
+    <string name="traceroute_log">בדיקת מסלול</string>
     <string name="messages">הודעות</string>
     <string name="region_frequency_plan">אזור</string>
     <string name="distance">מרחק</string>
@@ -152,4 +154,5 @@
     <string name="firmware_update_failed">העדכון נכשל</string>
     <string name="interval_unset">לא מוגדר</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

@@ -50,7 +50,7 @@ interface PacketDao {
         """
     SELECT * FROM packet
     WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
-        AND port_num = 1
+        AND port_num = 1 AND filtered = 0
     ORDER BY received_time DESC
     """,
     )
@@ -69,11 +69,11 @@ interface PacketDao {
         SELECT contact_key, MAX(received_time) as max_time
         FROM packet
         WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
-            AND port_num = 1
+            AND port_num = 1 AND filtered = 0
         GROUP BY contact_key
     ) latest ON p.contact_key = latest.contact_key AND p.received_time = latest.max_time
     WHERE (p.myNodeNum = 0 OR p.myNodeNum = (SELECT myNodeNum FROM my_node))
-        AND p.port_num = 1
+        AND p.port_num = 1 AND p.filtered = 0
     ORDER BY p.received_time DESC
     """,
     )
@@ -160,6 +160,18 @@ interface PacketDao {
     """,
     )
     fun getMessagesFrom(contact: String, limit: Int): Flow<List<PacketEntity>>
+
+    @Transaction
+    @Query(
+        """
+    SELECT * FROM packet
+    WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+        AND port_num = 1 AND contact_key = :contact
+        AND (filtered = 0 OR :includeFiltered = 1)
+    ORDER BY received_time DESC
+    """,
+    )
+    fun getMessagesFrom(contact: String, includeFiltered: Boolean): Flow<List<PacketEntity>>
 
     @Transaction
     @Query(
@@ -376,6 +388,47 @@ interface PacketDao {
     )
     suspend fun findReactionBySfppHash(hash: ByteArray): ReactionEntity?
 
+    @Query(
+        """
+        SELECT COUNT(*) FROM packet
+        WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+            AND port_num = 1 AND contact_key = :contact AND filtered = 1
+        """,
+    )
+    suspend fun getFilteredCount(contact: String): Int
+
+    @Query(
+        """
+        SELECT COUNT(*) FROM packet
+        WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+            AND port_num = 1 AND contact_key = :contact AND filtered = 1
+        """,
+    )
+    fun getFilteredCountFlow(contact: String): Flow<Int>
+
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM packet
+        WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+            AND port_num = 1 AND contact_key = :contact
+            AND (filtered = 0 OR :includeFiltered = 1)
+        ORDER BY received_time DESC
+        """,
+    )
+    fun getMessagesFromPaged(contact: String, includeFiltered: Boolean): PagingSource<Int, PacketEntity>
+
+    @Query("SELECT filtering_disabled FROM contact_settings WHERE contact_key = :contact")
+    suspend fun getContactFilteringDisabled(contact: String): Boolean?
+
+    @Transaction
+    suspend fun setContactFilteringDisabled(contact: String, disabled: Boolean) {
+        val settings =
+            getContactSettings(contact)?.copy(filteringDisabled = disabled)
+                ?: ContactSettings(contact_key = contact, filteringDisabled = disabled)
+        upsertContactSettings(listOf(settings))
+    }
+
     @Transaction
     suspend fun deleteAll() {
         deleteAllPackets()
@@ -399,13 +452,39 @@ interface PacketDao {
      */
     @Transaction
     suspend fun migrateChannelsByPSK(oldSettings: List<ChannelSettings>, newSettings: List<ChannelSettings>) {
-        val pskToNewIndex = newSettings.mapIndexed { idx, ch -> ch.psk to idx }.toMap()
+        // Pre-calculate mapping from old index to new index
+        val indexMap =
+            oldSettings
+                .mapIndexed { oldIndex, oldChannel ->
+                    val pskMatches =
+                        newSettings.mapIndexedNotNull { index, channel ->
+                            if (channel.psk == oldChannel.psk) index to channel else null
+                        }
+
+                    val newIndex =
+                        when {
+                            pskMatches.isEmpty() -> null
+                            pskMatches.size == 1 -> pskMatches.first().first
+                            else -> {
+                                // Multiple matches with same PSK. Disambiguate by Name.
+                                val nameMatches = pskMatches.filter { it.second.name == oldChannel.name }
+                                if (nameMatches.size == 1) {
+                                    nameMatches.first().first
+                                } else {
+                                    // Still ambiguous. Prefer keeping same index.
+                                    pskMatches.find { it.first == oldIndex }?.first ?: pskMatches.first().first
+                                }
+                            }
+                        }
+                    oldIndex to newIndex
+                }
+                .toMap()
+
         val allPackets = getAllUserPacketsForMigration()
         for (packet in allPackets) {
             val oldIndex = packet.data.channel
-            val oldPSK = oldSettings.getOrNull(oldIndex)?.psk
-            val newIndex = if (oldPSK != null) pskToNewIndex[oldPSK] else null
-            if (oldPSK != null && newIndex != null && oldIndex != newIndex) {
+            val newIndex = indexMap[oldIndex]
+            if (newIndex != null && oldIndex != newIndex) {
                 // Rebuild contact_key with the new index, keeping the rest unchanged
                 val oldKeySuffix = packet.contact_key.dropWhile { it.isDigit() }
                 val newContactKey = "$newIndex$oldKeySuffix"

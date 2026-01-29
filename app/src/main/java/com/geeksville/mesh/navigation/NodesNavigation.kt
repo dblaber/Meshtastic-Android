@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Meshtastic LLC
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.geeksville.mesh.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CellTower
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.PermScanWifi
-import androidx.compose.material.icons.filled.Power
-import androidx.compose.material.icons.filled.Router
+import androidx.compose.material.icons.rounded.CellTower
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Memory
+import androidx.compose.material.icons.rounded.People
+import androidx.compose.material.icons.rounded.PermScanWifi
+import androidx.compose.material.icons.rounded.Power
+import androidx.compose.material.icons.rounded.Router
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,6 +50,7 @@ import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.device
 import org.meshtastic.core.strings.environment
 import org.meshtastic.core.strings.host
+import org.meshtastic.core.strings.neighbor_info
 import org.meshtastic.core.strings.pax
 import org.meshtastic.core.strings.position_log
 import org.meshtastic.core.strings.power
@@ -62,6 +63,7 @@ import org.meshtastic.feature.node.metrics.DeviceMetricsScreen
 import org.meshtastic.feature.node.metrics.EnvironmentMetricsScreen
 import org.meshtastic.feature.node.metrics.HostMetricsLogScreen
 import org.meshtastic.feature.node.metrics.MetricsViewModel
+import org.meshtastic.feature.node.metrics.NeighborInfoLogScreen
 import org.meshtastic.feature.node.metrics.PaxMetricsScreen
 import org.meshtastic.feature.node.metrics.PositionLogScreen
 import org.meshtastic.feature.node.metrics.PowerMetricsScreen
@@ -235,6 +237,14 @@ fun NavGraphBuilder.nodeDetailGraph(navController: NavHostController, scrollToTo
                     ) {
                         it.destNum
                     }
+                NodeDetailRoutes.NeighborInfoLog::class ->
+                    addNodeDetailScreenComposable<NodeDetailRoutes.NeighborInfoLog>(
+                        navController,
+                        entry,
+                        entry.screenComposable,
+                    ) {
+                        it.destNum
+                    }
                 else -> Unit
             }
         }
@@ -286,49 +296,55 @@ enum class NodeDetailRoute(
     DEVICE(
         Res.string.device,
         NodeDetailRoutes.DeviceMetrics::class,
-        Icons.Default.Router,
+        Icons.Rounded.Router,
         { metricsVM, onNavigateUp -> DeviceMetricsScreen(metricsVM, onNavigateUp) },
     ),
     POSITION_LOG(
         Res.string.position_log,
         NodeDetailRoutes.PositionLog::class,
-        Icons.Default.LocationOn,
+        Icons.Rounded.LocationOn,
         { metricsVM, onNavigateUp -> PositionLogScreen(metricsVM, onNavigateUp) },
     ),
     ENVIRONMENT(
         Res.string.environment,
         NodeDetailRoutes.EnvironmentMetrics::class,
-        Icons.Default.LightMode,
+        Icons.Rounded.LightMode,
         { metricsVM, onNavigateUp -> EnvironmentMetricsScreen(metricsVM, onNavigateUp) },
     ),
     SIGNAL(
         Res.string.signal,
         NodeDetailRoutes.SignalMetrics::class,
-        Icons.Default.CellTower,
+        Icons.Rounded.CellTower,
         { metricsVM, onNavigateUp -> SignalMetricsScreen(metricsVM, onNavigateUp) },
     ),
     TRACEROUTE(
         Res.string.traceroute,
         NodeDetailRoutes.TracerouteLog::class,
-        Icons.Default.PermScanWifi,
+        Icons.Rounded.PermScanWifi,
         { metricsVM, onNavigateUp -> TracerouteLogScreen(viewModel = metricsVM, onNavigateUp = onNavigateUp) },
+    ),
+    NEIGHBOR_INFO(
+        Res.string.neighbor_info,
+        NodeDetailRoutes.NeighborInfoLog::class,
+        Icons.Rounded.Groups,
+        { metricsVM, onNavigateUp -> NeighborInfoLogScreen(viewModel = metricsVM, onNavigateUp = onNavigateUp) },
     ),
     POWER(
         Res.string.power,
         NodeDetailRoutes.PowerMetrics::class,
-        Icons.Default.Power,
+        Icons.Rounded.Power,
         { metricsVM, onNavigateUp -> PowerMetricsScreen(metricsVM, onNavigateUp) },
     ),
     HOST(
         Res.string.host,
         NodeDetailRoutes.HostMetricsLog::class,
-        Icons.Default.Memory,
+        Icons.Rounded.Memory,
         { metricsVM, onNavigateUp -> HostMetricsLogScreen(metricsVM, onNavigateUp) },
     ),
     PAX(
         Res.string.pax,
         NodeDetailRoutes.PaxMetrics::class,
-        Icons.Default.People,
+        Icons.Rounded.People,
         { metricsVM, onNavigateUp -> PaxMetricsScreen(metricsVM, onNavigateUp) },
     ),
 }

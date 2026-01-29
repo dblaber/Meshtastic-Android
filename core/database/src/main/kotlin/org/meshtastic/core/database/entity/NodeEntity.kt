@@ -64,6 +64,7 @@ data class NodeWithRelations(
             manuallyVerified = manuallyVerified,
             relayNode = relayNode,
             hopStart = hopStart,
+            nodeStatus = nodeStatus,
         )
     }
 
@@ -89,6 +90,7 @@ data class NodeWithRelations(
             paxcounter = paxcounter,
             notes = notes,
             manuallyVerified = manuallyVerified,
+            nodeStatus = nodeStatus,
         )
     }
 }
@@ -145,6 +147,7 @@ data class NodeEntity(
     @ColumnInfo(name = "notes", defaultValue = "") var notes: String = "",
     @ColumnInfo(name = "manually_verified", defaultValue = "0")
     var manuallyVerified: Boolean = false, // ONLY set true when scanned/imported manually
+    @ColumnInfo(name = "node_status") var nodeStatus: String? = null,
 ) {
     val deviceMetrics: TelemetryProtos.DeviceMetrics
         get() = deviceTelemetry.deviceMetrics
@@ -202,6 +205,7 @@ data class NodeEntity(
         notes = notes,
         relayNode = relayNode,
         hopStart = hopStart,
+        nodeStatus = nodeStatus,
     )
 
     fun toNodeInfo() = NodeInfo(

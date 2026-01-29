@@ -87,6 +87,7 @@
     <string name="device_gps">GPS на прыладзе</string>
     <string name="gpio">GPIO</string>
     <string name="debug">Адладка</string>
+    <string name="channel">Канал</string>
     <string name="channel_name">Назва канала</string>
     <string name="qr_code">QR-код</string>
     <string name="send">Адправіць</string>
@@ -154,7 +155,7 @@
     <string name="more_details">Больш звестак</string>
     <string name="snr">сігнал-шум</string>
     <string name="rssi">адносная магутнасць</string>
-    <string name="position_log">Гісторыя месцазнаходжання</string>
+    <string name="position_log">Месцазнаходжанне</string>
     <string name="none_quality">Нічога</string>
     <string name="signal_quality">Якасць сігнала</string>
     <string name="twenty_four_hours">24г</string>
@@ -241,4 +242,5 @@
     <string name="firmware_update_retry">Паспрабаваць яшчэ раз</string>
     <string name="firmware_update_keep_device_close">.</string>
     <!-- Compass -->
+    <!-- Message Filter -->
 </resources>

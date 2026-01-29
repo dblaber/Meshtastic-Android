@@ -16,29 +16,23 @@
  */
 package org.meshtastic.feature.messaging.component
 
-import androidx.compose.animation.AnimatedVisibility
+import android.content.ClipData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.FormatQuote
-import androidx.compose.material.icons.twotone.AddLink
-import androidx.compose.material.icons.twotone.Cloud
-import androidx.compose.material.icons.twotone.CloudDone
-import androidx.compose.material.icons.twotone.CloudOff
-import androidx.compose.material.icons.twotone.CloudUpload
-import androidx.compose.material.icons.twotone.HowToReg
-import androidx.compose.material.icons.twotone.Link
-import androidx.compose.material.icons.twotone.Warning
+import androidx.compose.material.icons.rounded.FormatQuote
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,18 +46,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.database.entity.Reaction
@@ -71,6 +67,7 @@ import org.meshtastic.core.database.model.Message
 import org.meshtastic.core.database.model.Node
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.strings.Res
+import org.meshtastic.core.strings.filter_message_label
 import org.meshtastic.core.strings.hops_away_template
 import org.meshtastic.core.strings.hops_out_of_total
 import org.meshtastic.core.strings.message_delivery_status
@@ -85,6 +82,14 @@ import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.component.Snr
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
 import org.meshtastic.core.ui.emoji.EmojiPicker
+import org.meshtastic.core.ui.icon.Cloud
+import org.meshtastic.core.ui.icon.CloudDone
+import org.meshtastic.core.ui.icon.CloudOffTwoTone
+import org.meshtastic.core.ui.icon.CloudSync
+import org.meshtastic.core.ui.icon.CloudTwoTone
+import org.meshtastic.core.ui.icon.Hops
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MessageItemColors
 
@@ -118,19 +123,22 @@ internal fun MessageItem(
     hasSameNext: Boolean = false,
 ) = Column(
     modifier =
-    modifier.padding(
-        top =
-        if (showUserName) {
-            16.dp
-        } else {
-            4.dp
-        },
-    ),
+    modifier
+        .fillMaxWidth()
+        .padding(
+            top =
+            if (showUserName) {
+                6.dp
+            } else {
+                1.dp
+            },
+        ),
 ) {
     var activeSheet by remember { mutableStateOf<ActiveSheet?>(null) }
-    val clipboardManager = LocalClipboardManager.current
+    val clipboardManager = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
+    val isLocal = node.num == ourNode.num
     if (activeSheet != null) {
         ModalBottomSheet(onDismissRequest = { activeSheet = null }, sheetState = sheetState) {
             when (activeSheet) {
@@ -148,7 +156,11 @@ internal fun MessageItem(
                         onMoreReactions = { activeSheet = ActiveSheet.Emoji },
                         onCopy = {
                             activeSheet = null
-                            clipboardManager.setText(AnnotatedString(message.text))
+                            coroutineScope.launch {
+                                clipboardManager.setClipEntry(
+                                    ClipEntry(ClipData.newPlainText("message", message.text)),
+                                )
+                            }
                         },
                         onSelect = {
                             activeSheet = null
@@ -158,6 +170,14 @@ internal fun MessageItem(
                             activeSheet = null
                             onDelete()
                         },
+                        statusString = message.getStatusStringRes(),
+                        status =
+                        if (isLocal) {
+                            message.status
+                        } else {
+                            null
+                        },
+                        onStatus = onStatusClick,
                     )
                 }
 
@@ -180,7 +200,9 @@ internal fun MessageItem(
     val containsBel = message.text.contains('\u0007')
 
     val alpha =
-        if (inSelectionMode) {
+        if (message.filtered) {
+            FILTERED_ALPHA
+        } else if (inSelectionMode) {
             if (selected) SELECTED_ALPHA else UNSELECTED_ALPHA
         } else {
             NORMAL_ALPHA
@@ -196,7 +218,7 @@ internal fun MessageItem(
             .copy(containerColor = containerColor, contentColor = contentColorFor(containerColor))
     val messageShape =
         getMessageBubbleShape(
-            cornerRadius = 16.dp,
+            cornerRadius = 8.dp,
             isSender = message.fromLocal,
             hasSamePrev = hasSamePrev,
             hasSameNext = hasSameNext,
@@ -216,7 +238,7 @@ internal fun MessageItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            NodeChip(node = node, onClick = onClickChip)
+            NodeChip(node = node, onClick = onClickChip, modifier = Modifier.height(28.dp))
             Text(
                 text = node.user.longName,
                 overflow = TextOverflow.Ellipsis,
@@ -225,7 +247,7 @@ internal fun MessageItem(
             )
             if (message.viaMqtt) {
                 Icon(
-                    Icons.Default.Cloud,
+                    MeshtasticIcons.Cloud,
                     contentDescription = stringResource(Res.string.via_mqtt),
                     modifier = Modifier.size(16.dp),
                 )
@@ -234,10 +256,11 @@ internal fun MessageItem(
     }
     Surface(
         modifier =
-        Modifier.padding(
-            start = if (!message.fromLocal) 0.dp else 24.dp,
-            end = if (message.fromLocal) 0.dp else 24.dp,
-        )
+        Modifier.align(if (message.fromLocal) Alignment.End else Alignment.Start)
+            .padding(
+                start = if (!message.fromLocal) 0.dp else 24.dp,
+                end = if (message.fromLocal) 0.dp else 24.dp,
+            )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = {
@@ -257,7 +280,7 @@ internal fun MessageItem(
         contentColor = contentColorFor(containerColor),
         shape = messageShape,
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.width(IntrinsicSize.Max)) {
             OriginalMessageSnippet(
                 modifier = Modifier.fillMaxWidth(),
                 message = message,
@@ -266,10 +289,10 @@ internal fun MessageItem(
                 onNavigateToOriginalMessage = onNavigateToOriginalMessage,
             )
 
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
                 AutoLinkText(
                     text = message.text,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = cardColors.contentColor,
                 )
 
@@ -357,52 +380,70 @@ internal fun MessageItem(
                                 Snr(message.snr)
                                 Rssi(message.rssi)
                             }
-                        } else if (!showRelayInfo) {
-                            // Only show simple hops away when relay info is disabled
-                            Text(
-                                text = stringResource(Res.string.hops_away_template, message.hopsAway),
-                                style = MaterialTheme.typography.labelSmall,
-                            )
+                        } else {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            ) {
+                                Icon(
+                                    imageVector = MeshtasticIcons.Hops,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = cardColors.contentColor.copy(alpha = 0.7f),
+                                )
+                                Text(
+                                    text = message.hopsAway.toString(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
                         }
                     }
                     if (containsBel) {
                         Text(text = "\uD83D\uDD14", modifier = Modifier.padding(end = 4.dp))
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        modifier = Modifier.padding(8.dp),
-                        text = message.time,
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                    if (message.filtered) {
+                        Text(
+                            text = stringResource(Res.string.filter_message_label),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                        )
+                    }
                     if (message.fromLocal) {
                         MessageStatusIcon(
                             status = message.status ?: MessageStatus.UNKNOWN,
-                            onClick = onStatusClick,
-                            modifier = modifier.size(24.dp).padding(horizontal = 4.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = message.time,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
                 }
             }
         }
     }
-    AnimatedVisibility(emojis.isNotEmpty()) {
-        ReactionRow(
-            modifier =
-            Modifier.padding(
+
+    ReactionRow(
+        modifier =
+        Modifier.align(if (message.fromLocal) Alignment.End else Alignment.Start)
+            .padding(
                 start = if (!message.fromLocal) 0.dp else 24.dp,
                 end = if (message.fromLocal) 0.dp else 24.dp,
             ),
-            reactions = if (message.fromLocal) emojis.reversed() else emojis,
-            myId = ourNode.user.id,
-            onSendReaction = sendReaction,
-            onShowReactions = onShowReactions,
-        )
-    }
+        reactions = if (message.fromLocal) emojis.reversed() else emojis,
+        myId = ourNode.user.id,
+        onSendReaction = sendReaction,
+        onShowReactions = onShowReactions,
+    )
 }
 
 private const val SELECTED_ALPHA = 0.6f
 private const val UNSELECTED_ALPHA = 0.2f
 private const val NORMAL_ALPHA = 0.4f
+private const val FILTERED_ALPHA = 0.5f
 
 private enum class ActiveSheet {
     Actions,
@@ -410,22 +451,22 @@ private enum class ActiveSheet {
 }
 
 @Composable
-private fun MessageStatusIcon(status: MessageStatus, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun MessageStatusIcon(status: MessageStatus, modifier: Modifier = Modifier) {
     val icon =
         when (status) {
-            MessageStatus.RECEIVED -> Icons.TwoTone.HowToReg
-            MessageStatus.QUEUED -> Icons.TwoTone.CloudUpload
-            MessageStatus.DELIVERED -> Icons.TwoTone.CloudDone
-            MessageStatus.SFPP_ROUTING -> Icons.TwoTone.AddLink
-            MessageStatus.SFPP_CONFIRMED -> Icons.TwoTone.Link
-            MessageStatus.ENROUTE -> Icons.TwoTone.Cloud
-            MessageStatus.ERROR -> Icons.TwoTone.CloudOff
-            else -> Icons.TwoTone.Warning
+            MessageStatus.RECEIVED -> MeshtasticIcons.CloudDone
+            MessageStatus.QUEUED -> MeshtasticIcons.CloudSync
+            MessageStatus.DELIVERED -> MeshtasticIcons.CloudDone
+            MessageStatus.SFPP_ROUTING -> MeshtasticIcons.CloudSync
+            MessageStatus.SFPP_CONFIRMED -> MeshtasticIcons.CloudDone
+            MessageStatus.ENROUTE -> MeshtasticIcons.CloudTwoTone
+            MessageStatus.ERROR -> MeshtasticIcons.CloudOffTwoTone
+            else -> MeshtasticIcons.Warning
         }
     Icon(
+        modifier = modifier,
         imageVector = icon,
         contentDescription = stringResource(Res.string.message_delivery_status),
-        modifier = modifier.clickable(onClick = onClick),
     )
 }
 
@@ -459,12 +500,12 @@ private fun OriginalMessageSnippet(
             ),
         ) {
             Row(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Icon(
-                    Icons.Default.FormatQuote,
+                    Icons.Rounded.FormatQuote,
                     contentDescription = stringResource(Res.string.reply),
                     modifier = Modifier.size(16.dp),
                 )
@@ -480,7 +521,6 @@ private fun OriginalMessageSnippet(
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 20.dp),
                 )
             }
         }
@@ -548,8 +588,31 @@ private fun MessageItemPreview() {
             originalMessage = received,
             viaMqtt = true,
         )
+    val filteredMessage =
+        Message(
+            text = "This message was filtered",
+            time = "10:30",
+            fromLocal = false,
+            status = MessageStatus.RECEIVED,
+            snr = 1.5f,
+            rssi = 70,
+            hopsAway = 1,
+            uuid = 3L,
+            receivedTime = System.currentTimeMillis(),
+            node = NodePreviewParameterProvider().minnieMouse,
+            read = false,
+            routingError = 0,
+            packetId = 4546,
+            emojis = listOf(),
+            replyId = null,
+            viaMqtt = false,
+            filtered = true,
+        )
     AppTheme {
-        Column(modifier = Modifier.background(MaterialTheme.colorScheme.background).padding(vertical = 16.dp)) {
+        Column(
+            modifier =
+            Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).padding(vertical = 16.dp),
+        ) {
             MessageItem(
                 message = sent,
                 node = sent.node,
@@ -583,6 +646,21 @@ private fun MessageItemPreview() {
             MessageItem(
                 message = receivedWithOriginalMessage,
                 node = receivedWithOriginalMessage.node,
+                selected = false,
+                ourNode = sent.node,
+                onReply = {},
+                sendReaction = {},
+                onShowReactions = {},
+                onClick = {},
+                onLongClick = {},
+                onDoubleClick = {},
+                onClickChip = {},
+                onNavigateToOriginalMessage = {},
+            )
+
+            MessageItem(
+                message = filteredMessage,
+                node = filteredMessage.node,
                 selected = false,
                 ourNode = sent.node,
                 onReply = {},

@@ -34,8 +34,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -180,7 +180,7 @@ fun EditWaypointDialog(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
-                                imageVector = Icons.Default.Lock,
+                                imageVector = Icons.Rounded.Lock,
                                 contentDescription = stringResource(Res.string.locked),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -199,7 +199,7 @@ fun EditWaypointDialog(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
-                                imageVector = Icons.Default.CalendarMonth,
+                                imageVector = Icons.Rounded.CalendarMonth,
                                 contentDescription = stringResource(Res.string.expires),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -246,10 +246,15 @@ fun EditWaypointDialog(
                             DatePickerDialog(
                                 context,
                                 { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-                                    calendar.clear()
-                                    calendar.set(selectedYear, selectedMonth, selectedDay, hour, minute)
+                                    val tempCal = Calendar.getInstance()
+                                    if (waypointInput.expire != 0 && waypointInput.expire != Int.MAX_VALUE) {
+                                        tempCal.timeInMillis = waypointInput.expire * 1000L
+                                    } else {
+                                        tempCal.add(Calendar.HOUR_OF_DAY, 8)
+                                    }
+                                    tempCal.set(selectedYear, selectedMonth, selectedDay)
                                     waypointInput =
-                                        waypointInput.copy { expire = (calendar.timeInMillis / 1000).toInt() }
+                                        waypointInput.copy { expire = (tempCal.timeInMillis / 1000).toInt() }
                                 },
                                 year,
                                 month,
@@ -262,7 +267,11 @@ fun EditWaypointDialog(
                                 { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
                                     // Keep the existing date part
                                     val tempCal = Calendar.getInstance()
-                                    tempCal.timeInMillis = waypointInput.expire * 1000L
+                                    if (waypointInput.expire != 0 && waypointInput.expire != Int.MAX_VALUE) {
+                                        tempCal.timeInMillis = waypointInput.expire * 1000L
+                                    } else {
+                                        tempCal.add(Calendar.HOUR_OF_DAY, 8)
+                                    }
                                     tempCal.set(Calendar.HOUR_OF_DAY, selectedHour)
                                     tempCal.set(Calendar.MINUTE, selectedMinute)
                                     waypointInput =

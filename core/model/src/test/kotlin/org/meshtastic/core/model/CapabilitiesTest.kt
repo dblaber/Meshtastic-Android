@@ -25,18 +25,19 @@ class CapabilitiesTest {
     private fun caps(version: String?) = Capabilities(version, forceEnableAll = false)
 
     @Test
-    fun `canMuteNode requires v2 8 0`() {
+    fun `canMuteNode requires v2 7 18`() {
         assertFalse(caps("2.7.15").canMuteNode)
-        assertFalse(caps("2.7.99").canMuteNode)
+        assertTrue(caps("2.7.18").canMuteNode)
         assertTrue(caps("2.8.0").canMuteNode)
         assertTrue(caps("2.8.1").canMuteNode)
     }
 
+    // FIXME: needs updating when NeighborInfo is working properly
     @Test
-    fun `canRequestNeighborInfo requires v2 7 15`() {
+    fun `canRequestNeighborInfo disabled`() {
         assertFalse(caps("2.7.14").canRequestNeighborInfo)
-        assertTrue(caps("2.7.15").canRequestNeighborInfo)
-        assertTrue(caps("2.8.0").canRequestNeighborInfo)
+        assertFalse(caps("2.7.15").canRequestNeighborInfo)
+        assertFalse(caps("2.8.0").canRequestNeighborInfo)
     }
 
     @Test

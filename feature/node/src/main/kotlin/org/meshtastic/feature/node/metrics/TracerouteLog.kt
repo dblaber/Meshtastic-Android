@@ -20,36 +20,26 @@ import android.text.format.DateUtils
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.PersonOff
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -72,13 +62,13 @@ import org.meshtastic.core.model.getTracerouteResponse
 import org.meshtastic.core.model.toMessageRes
 import org.meshtastic.core.strings.Res
 import org.meshtastic.core.strings.close
-import org.meshtastic.core.strings.delete
 import org.meshtastic.core.strings.routing_error_no_response
 import org.meshtastic.core.strings.traceroute
 import org.meshtastic.core.strings.traceroute_diff
 import org.meshtastic.core.strings.traceroute_direct
 import org.meshtastic.core.strings.traceroute_duration
 import org.meshtastic.core.strings.traceroute_hops
+import org.meshtastic.core.strings.traceroute_log
 import org.meshtastic.core.strings.traceroute_route_back_to_us
 import org.meshtastic.core.strings.traceroute_route_towards_dest
 import org.meshtastic.core.strings.traceroute_time_and_text
@@ -87,11 +77,18 @@ import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SNR_FAIR_THRESHOLD
 import org.meshtastic.core.ui.component.SNR_GOOD_THRESHOLD
 import org.meshtastic.core.ui.component.SimpleAlertDialog
+import org.meshtastic.core.ui.icon.Group
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PersonOff
+import org.meshtastic.core.ui.icon.Refresh
+import org.meshtastic.core.ui.icon.Route
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.feature.map.model.TracerouteOverlay
+import org.meshtastic.feature.node.component.CooldownIconButton
+import org.meshtastic.feature.node.detail.NodeRequestEffect
 import org.meshtastic.feature.node.metrics.CommonCharts.MS_PER_SEC
 import org.meshtastic.proto.MeshProtos
 
@@ -103,7 +100,7 @@ private data class TracerouteDialog(
 )
 
 @OptIn(ExperimentalFoundationApi::class)
-@Suppress("LongMethod")
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable
 fun TracerouteLogScreen(
     modifier: Modifier = Modifier,
@@ -112,6 +109,18 @@ fun TracerouteLogScreen(
     onViewOnMap: (requestId: Int, responseLogUuid: String) -> Unit = { _, _ -> },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is NodeRequestEffect.ShowFeedback -> {
+                    @Suppress("SpreadOperator")
+                    snackbarHostState.showSnackbar(getString(effect.resource, *effect.args.toTypedArray()))
+                }
+            }
+        }
+    }
 
     fun getUsername(nodeNum: Int): String = with(viewModel.getUser(nodeNum)) { "$longName ($shortName)" }
 
@@ -131,16 +140,28 @@ fun TracerouteLogScreen(
 
     Scaffold(
         topBar = {
+            val lastTracerouteTime by viewModel.lastTraceRouteTime.collectAsState()
             MainAppBar(
                 title = state.node?.user?.longName ?: "",
+                subtitle = stringResource(Res.string.traceroute_log),
                 ourNode = null,
                 showNodeChip = false,
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,
-                actions = {},
+                actions = {
+                    if (!state.isLocal) {
+                        CooldownIconButton(
+                            onClick = { viewModel.requestTraceroute() },
+                            cooldownTimestamp = lastTracerouteTime,
+                        ) {
+                            Icon(imageVector = MeshtasticIcons.Refresh, contentDescription = null)
+                        }
+                    }
+                },
                 onClickChip = {},
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         LazyColumn(
             modifier = modifier.fillMaxSize().padding(innerPadding),
@@ -203,9 +224,10 @@ fun TracerouteLogScreen(
                     }
 
                 Box {
-                    TracerouteItem(
+                    MetricLogItem(
                         icon = icon,
                         text = stringResource(Res.string.traceroute_time_and_text, time, text),
+                        contentDescription = stringResource(Res.string.traceroute),
                         modifier =
                         Modifier.combinedClickable(onLongClick = { expanded = true }) {
                             val dialogMessage =
@@ -292,58 +314,27 @@ private fun TracerouteLogDialogs(
     }
 }
 
-@Composable
-private fun DeleteItem(onClick: () -> Unit) {
-    DropdownMenuItem(
-        onClick = onClick,
-        text = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(Res.string.delete),
-                    tint = MaterialTheme.colorScheme.error,
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(text = stringResource(Res.string.delete), color = MaterialTheme.colorScheme.error)
-            }
-        },
-    )
-}
-
-@Composable
-private fun TracerouteItem(icon: ImageVector, text: String, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxWidth().heightIn(min = 56.dp).padding(vertical = 2.dp)) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = icon, contentDescription = stringResource(Res.string.traceroute))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = text, style = MaterialTheme.typography.bodyLarge)
-            }
-        }
-    }
-}
-
 /** Generates a display string and icon based on the route discovery information. */
 @Composable
 private fun MeshProtos.RouteDiscovery?.getTextAndIcon(): Pair<String, ImageVector> = when {
     this == null -> {
-        stringResource(Res.string.routing_error_no_response) to Icons.Default.PersonOff
+        stringResource(Res.string.routing_error_no_response) to MeshtasticIcons.PersonOff
     }
     // A direct route means the sender and receiver are the only two nodes in the route.
     routeCount <= 2 && routeBackCount <= 2 -> { // also check routeBackCount for direct to be more robust
-        stringResource(Res.string.traceroute_direct) to Icons.Default.Group
+        stringResource(Res.string.traceroute_direct) to MeshtasticIcons.Group
     }
 
     routeCount == routeBackCount -> {
         val hops = routeCount - 2
-        pluralStringResource(Res.plurals.traceroute_hops, hops, hops) to Icons.Default.Groups
+        pluralStringResource(Res.plurals.traceroute_hops, hops, hops) to MeshtasticIcons.Route
     }
 
     else -> {
         // Asymmetric route
         val towards = maxOf(0, routeCount - 2)
         val back = maxOf(0, routeBackCount - 2)
-        stringResource(Res.string.traceroute_diff, towards, back) to Icons.Default.Groups
+        stringResource(Res.string.traceroute_diff, towards, back) to MeshtasticIcons.Route
     }
 }
 
@@ -394,5 +385,11 @@ private fun TracerouteItemPreview() {
             System.currentTimeMillis(),
             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_ABBREV_ALL,
         )
-    AppTheme { TracerouteItem(icon = Icons.Default.Group, text = "$time - Direct") }
+    AppTheme {
+        MetricLogItem(
+            icon = MeshtasticIcons.Group,
+            text = "$time - Direct",
+            contentDescription = stringResource(Res.string.traceroute),
+        )
+    }
 }
