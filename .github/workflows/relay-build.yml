@@ -31,15 +31,15 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Decode keystore
-        if: ${{ env.KEYSTORE != '' }}
         env:
           KEYSTORE: ${{ secrets.KEYSTORE }}
+        if: env.KEYSTORE != ''
         run: echo "$KEYSTORE" | base64 -d > app/release-keystore.jks
 
       - name: Create keystore.properties
-        if: ${{ secrets.KEYSTORE_PROPERTIES != '' }}
         env:
           KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+        if: env.KEYSTORE_PROPERTIES != ''
         run: echo "$KEYSTORE_PROPERTIES" > keystore.properties
 
       - name: Create local.properties
