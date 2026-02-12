@@ -20,6 +20,20 @@ plugins {
     alias(libs.plugins.meshtastic.android.library)
     alias(libs.plugins.meshtastic.kotlinx.serialization)
     alias(libs.plugins.kotlin.parcelize)
+    `maven-publish`
+}
+
+apply(from = rootProject.file("gradle/publishing.gradle.kts"))
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["googleRelease"])
+                artifactId = "core-model"
+            }
+        }
+    }
 }
 
 configure<LibraryExtension> {
@@ -28,15 +42,20 @@ configure<LibraryExtension> {
         aidl = true
     }
     namespace = "org.meshtastic.core.model"
+
+    defaultConfig {
+        // Lowering minSdk to 21 for better compatibility with ATAK and other plugins
+        minSdk = 21
+    }
+
+    publishing { singleVariant("googleRelease") { withSourcesJar() } }
 }
 
 dependencies {
-    implementation(projects.core.common)
-    implementation(projects.core.proto)
-    implementation(projects.core.strings)
+    api(projects.core.proto)
 
-    implementation(libs.androidx.annotation)
-    implementation(libs.kotlinx.serialization.json)
+    api(libs.androidx.annotation)
+    api(libs.kotlinx.serialization.json)
     implementation(libs.kermit)
     implementation(libs.zxing.android.embedded) { isTransitive = false }
     implementation(libs.zxing.core)

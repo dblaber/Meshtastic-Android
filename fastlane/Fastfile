@@ -17,8 +17,9 @@ default_platform(:android)
 
 platform :android do
   desc "Deploy a new version to the internal track on Google Play"
-  lane :internal do
+  lane :internal do |options|
     aab_path = build_google_release
+    
     upload_to_play_store(
       track: 'internal',
       aab: aab_path,

@@ -772,7 +772,7 @@ constructor(
         }
     }
 
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "KotlinConstantConditions")
     private fun rememberReaction(packet: MeshPacket) = scope.handledLaunch {
         val emoji = packet.decoded.payload.toByteArray().decodeToString()
         val fromId = dataMapper.toNodeID(packet.from)

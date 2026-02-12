@@ -20,10 +20,13 @@ package org.meshtastic.buildlogic
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import com.android.build.api.dsl.LibraryExtension
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -36,16 +39,25 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension,
 ) {
+    val compileSdkVersion = configProperties.getProperty("COMPILE_SDK").toInt()
+    val minSdkVersion = configProperties.getProperty("MIN_SDK").toInt()
+    val targetSdkVersion = configProperties.getProperty("TARGET_SDK").toInt()
 
     commonExtension.apply {
-        compileSdk = configProperties.getProperty("COMPILE_SDK").toInt()
-
-        defaultConfig.apply {
-            minSdk = configProperties.getProperty("MIN_SDK").toInt()
-            if (commonExtension is ApplicationExtension) {
-                commonExtension.defaultConfig.targetSdk = configProperties.getProperty("TARGET_SDK").toInt()
+        when (this) {
+            is ApplicationExtension -> {
+                compileSdk = compileSdkVersion
+                defaultConfig.targetSdk = targetSdkVersion
+            }
+            is LibraryExtension -> {
+                compileSdk = compileSdkVersion
             }
         }
+
+        defaultConfig.minSdk = minSdkVersion
+
+        compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+        compileOptions.targetCompatibility = JavaVersion.VERSION_17
     }
 
     configureKotlin<KotlinAndroidProjectExtension>()
@@ -86,11 +98,14 @@ internal fun Project.configureKotlinJvm() {
  */
 private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin() {
     extensions.configure<T> {
-        jvmToolchain(21)
+        // Using Java 17 for better compatibility with consumers (e.g. plugins, older environments)
+        // while still supporting modern Kotlin features.
+        jvmToolchain(17)
     }
 
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
             allWarningsAsErrors.set(false)
             freeCompilerArgs.addAll(
                 // Enable experimental coroutines APIs, including Flow

@@ -82,6 +82,7 @@ import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.component.Snr
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
 import org.meshtastic.core.ui.emoji.EmojiPicker
+import org.meshtastic.core.ui.icon.Acknowledged
 import org.meshtastic.core.ui.icon.Cloud
 import org.meshtastic.core.ui.icon.CloudDone
 import org.meshtastic.core.ui.icon.CloudOffTwoTone
@@ -454,7 +455,7 @@ private enum class ActiveSheet {
 fun MessageStatusIcon(status: MessageStatus, modifier: Modifier = Modifier) {
     val icon =
         when (status) {
-            MessageStatus.RECEIVED -> MeshtasticIcons.CloudDone
+            MessageStatus.RECEIVED -> MeshtasticIcons.Acknowledged
             MessageStatus.QUEUED -> MeshtasticIcons.CloudSync
             MessageStatus.DELIVERED -> MeshtasticIcons.CloudDone
             MessageStatus.SFPP_ROUTING -> MeshtasticIcons.CloudSync

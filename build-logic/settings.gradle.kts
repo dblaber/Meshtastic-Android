@@ -20,8 +20,17 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
+        maven {
+            url = uri("https://jitpack.io")
+            content {
+                includeGroupByRegex("com\\.github\\..*")
+            }
+        }
     }
+}
+
+plugins {
+    id("com.gradle.develocity") version("4.3.2")
 }
 
 dependencyResolutionManagement {
@@ -35,7 +44,12 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
+        maven {
+            url = uri("https://jitpack.io")
+            content {
+                includeGroupByRegex("com\\.github\\..*")
+            }
+        }
     }
     versionCatalogs {
         create("libs") {
@@ -43,6 +57,9 @@ dependencyResolutionManagement {
         }
     }
 }
+
+// Shared Develocity and Build Cache configuration
+apply(from = "../gradle/develocity.settings.gradle")
 
 rootProject.name = "build-logic"
 include(":convention")

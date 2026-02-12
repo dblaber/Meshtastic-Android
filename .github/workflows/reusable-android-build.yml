@@ -11,12 +11,23 @@ on:
         required: false
       CODECOV_TOKEN:
         required: false
+      GRADLE_CACHE_URL:
+        required: false
+      GRADLE_CACHE_USERNAME:
+        required: false
+      GRADLE_CACHE_PASSWORD:
+        required: false
     inputs:
       upload_artifacts:
         description: 'Whether to upload build and Detekt artifacts'
         required: false
         type: boolean
         default: true
+      test_flavors:
+        description: 'Which flavors to build and test: "google", "fdroid", or "both"'
+        required: false
+        type: string
+        default: 'both'
 
 jobs:
   build:
@@ -30,6 +41,9 @@ jobs:
       DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
       DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
       MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      GRADLE_CACHE_URL: ${{ secrets.GRADLE_CACHE_URL }}
+      GRADLE_CACHE_USERNAME: ${{ secrets.GRADLE_CACHE_USERNAME }}
+      GRADLE_CACHE_PASSWORD: ${{ secrets.GRADLE_CACHE_PASSWORD }}
 
     steps:
 
@@ -39,10 +53,10 @@ jobs:
           fetch-depth: 0
           submodules: 'recursive'
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'jetbrains'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,8 +82,21 @@ jobs:
         run: |
           echo "datadogApplicationId=$DATADOG_APPLICATION_ID" >> ./secrets.properties
           echo "datadogClientToken=$DATADOG_CLIENT_TOKEN" >> ./secrets.properties
+
+      - name: Determine build tasks
+        id: build-tasks
+        run: |
+          FLAVOR="${{ inputs.test_flavors }}"
+          if [ "$FLAVOR" = "google" ]; then
+            echo "tasks=assembleGoogleDebug testGoogleDebugUnitTest" >> $GITHUB_OUTPUT
+          elif [ "$FLAVOR" = "fdroid" ]; then
+            echo "tasks=assembleFdroidDebug testFdroidDebugUnitTest" >> $GITHUB_OUTPUT
+          else
+            echo "tasks=assembleDebug testGoogleDebugUnitTest testFdroidDebugUnitTest" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and Run Unit Tests
-        run: ./gradlew assembleDebug testDebugUnitTest testGoogleDebugUnitTest testFdroidDebugUnitTest koverXmlReport --continue --scan
+        run: ./gradlew ${{ steps.build-tasks.outputs.tasks }} koverXmlReport -Pci=true --continue --scan
         env:
           VERSION_CODE: ${{ env.VERSION_CODE }}
 
@@ -92,14 +119,14 @@ jobs:
           files: "**/build/test-results/**/*.xml,**/build/outputs/androidTest-results/**/*.xml"
 
       - name: Upload F-Droid debug artifact
-        if: ${{ inputs.upload_artifacts }}
+        if: ${{ inputs.upload_artifacts && (inputs.test_flavors == 'fdroid' || inputs.test_flavors == 'both') }}
         uses: actions/upload-artifact@v6
         with:
           name: fdroidDebug
           path: app/build/outputs/apk/fdroid/debug/app-fdroid-debug.apk
           retention-days: 14
       - name: Upload Google debug artifact
-        if: ${{ inputs.upload_artifacts }}
+        if: ${{ inputs.upload_artifacts && (inputs.test_flavors == 'google' || inputs.test_flavors == 'both') }}
         uses: actions/upload-artifact@v6
         with:
           name: googleDebug

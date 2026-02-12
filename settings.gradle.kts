@@ -18,6 +18,7 @@
 include(
     ":app",
     ":core:analytics",
+    ":core:api",
     ":core:common",
     ":core:data",
     ":core:database",
@@ -58,9 +59,15 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
+        maven {
+            url = uri("https://jitpack.io")
+            content {
+                includeGroupByRegex("com\\.github\\..*")
+            }
+        }
     }
 }
 
@@ -70,29 +77,8 @@ plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.4.0"
 }
 
-develocity {
-    buildScan {
-        capture {
-            fileFingerprints.set(true)
-        }
-        publishing.onlyIf { false }
-    }
-    buildCache {
-        local {
-            isEnabled = true
-        }
-        remote(HttpBuildCache::class.java) {
-            isAllowInsecureProtocol = true
-            // Replace with your selfhosted instance address
-            // see: https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_setup_http_backend
-            url = uri("http://192.168.1.3:5071/cache/")
-
-            // Allow this machine to upload results to the cache
-            isPush = true
-
-        }
-    }
-}
+// Shared Develocity and Build Cache configuration
+apply(from = "gradle/develocity.settings.gradle")
 
 @Suppress("UnstableApiUsage")
 toolchainManagement {
