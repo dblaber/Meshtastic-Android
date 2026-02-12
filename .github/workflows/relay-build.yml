@@ -44,6 +44,12 @@ jobs:
         if: env.KEYSTORE_PROPERTIES != ''
         run: echo "$KEYSTORE_PROPERTIES" > keystore.properties
 
+      - name: Decode google-services.json
+        env:
+          GSERVICES: ${{ secrets.GSERVICES }}
+        if: env.GSERVICES != ''
+        run: echo "$GSERVICES" | base64 -d > app/google-services.json
+
       - name: Create local.properties
         env:
           MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
