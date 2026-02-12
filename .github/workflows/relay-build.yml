@@ -60,7 +60,7 @@ jobs:
           fi
 
       - name: Build Google Release APK
-        run: ./gradlew assembleGoogleRelease -Pci=true
+        run: ./gradlew assembleGoogleRelease -Pci=true -x uploadCrashlyticsMappingFileGoogleRelease
 
       - name: Build F-Droid Release APK
         run: ./gradlew assembleFdroidRelease -Pci=true
