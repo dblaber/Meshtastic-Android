@@ -1,0 +1,83 @@
+name: Relay Feature Build
+
+on:
+  push:
+    branches:
+      - relayinfo_feature
+    tags:
+      - 'v*-relay*'
+
+jobs:
+  build:
+    name: Build & Sign APKs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode keystore
+        if: ${{ env.KEYSTORE != '' }}
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+        run: echo "$KEYSTORE" | base64 -d > app/release-keystore.jks
+
+      - name: Create keystore.properties
+        if: ${{ secrets.KEYSTORE_PROPERTIES != '' }}
+        env:
+          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+        run: echo "$KEYSTORE_PROPERTIES" > keystore.properties
+
+      - name: Create local.properties
+        env:
+          MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          if [ -n "$MAPS_API_KEY" ]; then
+            echo "MAPS_API_KEY=$MAPS_API_KEY" >> local.properties
+          fi
+
+      - name: Build Google Release APK
+        run: ./gradlew assembleGoogleRelease -Pci=true
+
+      - name: Build F-Droid Release APK
+        run: ./gradlew assembleFdroidRelease -Pci=true
+
+      - name: Upload Google APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-google-release
+          path: app/build/outputs/apk/google/release/app-google-release.apk
+          retention-days: 30
+
+      - name: Upload F-Droid APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-fdroid-release
+          path: app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            app/build/outputs/apk/google/release/app-google-release.apk
+            app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
