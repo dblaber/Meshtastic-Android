@@ -151,6 +151,8 @@ data class NodeEntity(
     @ColumnInfo(name = "node_status") var nodeStatus: String? = null,
     /** The transport mechanism this node was last heard over (see [MeshPacket.TransportMechanism]). */
     @ColumnInfo(name = "last_transport", defaultValue = "0") var lastTransport: Int = 0,
+    @ColumnInfo(name = "relay_node") var relayNode: Int? = null,
+    @ColumnInfo(name = "hop_start", defaultValue = "0") var hopStart: Int = 0,
 ) {
     val deviceMetrics: org.meshtastic.proto.DeviceMetrics?
         get() = deviceTelemetry.device_metrics

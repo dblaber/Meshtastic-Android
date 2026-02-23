@@ -386,7 +386,6 @@ internal fun MessageItem(
                             }
                         }
                     }
-                    }
                     if (containsBel) {
                         Text(text = "\uD83D\uDD14", modifier = Modifier.padding(end = 4.dp))
                     }

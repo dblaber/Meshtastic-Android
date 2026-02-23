@@ -424,14 +424,6 @@ fun SettingsScreen(
                     exportDataLauncher.launch(intent)
                 }
 
-                val showRelayInfo by settingsViewModel.showRelayInfo.collectAsStateWithLifecycle()
-                SwitchListItem(
-                    text = stringResource(Res.string.show_relay_info),
-                    leadingIcon = Icons.Rounded.Info,
-                    checked = showRelayInfo,
-                    onClick = { settingsViewModel.setShowRelayInfo(!showRelayInfo) },
-                )
-
                 ListItem(
                     text = stringResource(Res.string.intro_show),
                     leadingIcon = Icons.Rounded.WavingHand,
