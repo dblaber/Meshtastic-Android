@@ -250,6 +250,7 @@ data class Message(
     /** Received signal strength, or null when the radio did not report one. 0 dBm is a valid reading. */
     val rssi: Int?,
     val hopsAway: Int,
+    val hopStart: Int = 0,
     val replyId: Int?,
     val originalMessage: Message? = null,
     val viaMqtt: Boolean = false,
