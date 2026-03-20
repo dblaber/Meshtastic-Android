@@ -170,6 +170,10 @@ interface UiPrefs {
     /** Drops [nodeNums] from [keptUnheardNodes], so the banner offers them again if they go unheard later. */
     fun forgetKeptUnheardNodes(nodeNums: Set<Int>)
 
+    val showRelayInfo: StateFlow<Boolean>
+
+    fun setShowRelayInfo(show: Boolean)
+
     fun shouldProvideNodeLocation(nodeNum: Int): StateFlow<Boolean>
 
     fun setShouldProvideNodeLocation(nodeNum: Int, provide: Boolean)

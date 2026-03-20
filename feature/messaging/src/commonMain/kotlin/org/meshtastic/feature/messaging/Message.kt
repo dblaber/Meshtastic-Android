@@ -184,6 +184,7 @@ fun MessageScreen(
     val messageInputState = rememberTextFieldState(message)
     val showQuickChat by viewModel.showQuickChat.collectAsStateWithLifecycle()
     val showFullMessageTimestamps by viewModel.showFullMessageTimestamps.collectAsStateWithLifecycle()
+    val showRelayInfo by viewModel.showRelayInfo.collectAsStateWithLifecycle()
     val filteredCount by viewModel.filteredCount.collectAsStateWithLifecycle()
     val showFiltered by viewModel.showFiltered.collectAsStateWithLifecycle()
     val filteringDisabled = contactSettings[contactKey]?.filteringDisabled ?: false
@@ -538,6 +539,7 @@ fun MessageScreen(
                     showFullMessageTimestamps = showFullMessageTimestamps,
                     canReact = !isRetiredChannel,
                     canSend = !isRetiredChannel,
+                    showRelayInfo = showRelayInfo,
                 ),
                 handlers =
                 MessageListHandlers(
