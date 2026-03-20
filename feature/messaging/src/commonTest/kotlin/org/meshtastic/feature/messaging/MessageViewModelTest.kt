@@ -125,6 +125,7 @@ class MessageViewModelTest {
         every { uiPrefs.showQuickChat } returns showQuickChatFlow
         every { uiPrefs.toggleShowQuickChat() } returns Unit
         every { uiPrefs.showFullMessageTimestamps } returns showFullMessageTimestampsFlow
+        every { uiPrefs.showRelayInfo } returns MutableStateFlow(false)
 
         every { packetRepository.getContactSettings() } returns contactSettingsFlow
         every { packetRepository.getFirstUnreadMessageUuid(any<String>()) } returns MutableStateFlow(null)

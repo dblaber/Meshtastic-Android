@@ -189,6 +189,7 @@ class MessageViewModel(
     val channels = radioConfigRepository.channelSetFlow.stateInWhileSubscribed(ChannelSet.Builder().build())
 
     val showQuickChat = uiPrefs.showQuickChat
+    val showRelayInfo = uiPrefs.showRelayInfo
 
     val showFullMessageTimestamps = uiPrefs.showFullMessageTimestamps
 
