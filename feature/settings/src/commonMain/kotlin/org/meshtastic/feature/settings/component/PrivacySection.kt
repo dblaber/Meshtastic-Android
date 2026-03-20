@@ -24,6 +24,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.analytics_okay
 import org.meshtastic.core.resources.location_disabled
 import org.meshtastic.core.resources.provide_location_to_mesh
+import org.meshtastic.core.resources.show_relay_info
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.LocationOn
@@ -42,6 +43,8 @@ internal fun ColumnScope.PrivacySettingsContent(
     onToggleLocation: (Boolean) -> Unit,
     homoglyphEnabled: Boolean,
     onToggleHomoglyph: () -> Unit,
+    showRelayInfo: Boolean,
+    onToggleShowRelayInfo: (Boolean) -> Unit,
     startProvideLocation: () -> Unit,
     stopProvideLocation: () -> Unit,
 ) {
@@ -85,4 +88,10 @@ internal fun ColumnScope.PrivacySettingsContent(
     )
 
     HomoglyphSetting(homoglyphEncodingEnabled = homoglyphEnabled, onToggle = onToggleHomoglyph)
+
+    SwitchListItem(
+        text = stringResource(Res.string.show_relay_info),
+        checked = showRelayInfo,
+        onClick = { onToggleShowRelayInfo(!showRelayInfo) },
+    )
 }

@@ -165,6 +165,10 @@ interface UiPrefs {
     /** Records a notification key after the platform notification has been scheduled successfully. */
     fun recordFirmwareUpdateNotificationKey(key: String)
 
+    val showRelayInfo: StateFlow<Boolean>
+
+    fun setShowRelayInfo(show: Boolean)
+
     fun shouldProvideNodeLocation(nodeNum: Int): StateFlow<Boolean>
 
     fun setShouldProvideNodeLocation(nodeNum: Int, provide: Boolean)

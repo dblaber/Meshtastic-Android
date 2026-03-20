@@ -172,8 +172,14 @@ class SettingsViewModel(
         uiPrefs.setAppIntroCompleted(false)
     }
 
-    fun unlockHiddenFeatures() {
-        hiddenFeaturesUnlock.unlock()
+    val showRelayInfo = uiPrefs.showRelayInfo
+
+    fun setShowRelayInfo(show: Boolean) {
+        uiPrefs.setShowRelayInfo(show)
+    }
+
+    fun unlockExcludedModules() {
+        _excludedModulesUnlocked.update { true }
     }
 
     /**

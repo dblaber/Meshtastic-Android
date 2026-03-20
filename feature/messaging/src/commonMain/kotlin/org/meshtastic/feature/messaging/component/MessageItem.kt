@@ -70,7 +70,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_message_from
 import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
-import org.meshtastic.core.resources.message_translated_label
+import org.meshtastic.core.resources.relayed_by
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.ui.component.AutoLinkText
@@ -132,6 +132,7 @@ fun MessageItem(
     resolveMention: (String) -> Node? = { null },
     onNavigateToOriginalMessage: (Int) -> Unit = {},
     onStatusClick: () -> Unit = {},
+    relayNodeName: String? = null,
     hasSamePrev: Boolean = false,
     hasSameNext: Boolean = false,
     searchQuery: String = "",
@@ -400,6 +401,14 @@ fun MessageItem(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
+                        }
+                        if (relayNodeName != null) {
+                            Text(
+                                text = stringResource(Res.string.relayed_by, relayNodeName),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = contentColor.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(start = 4.dp),
+                            )
                         }
                     }
                     if (containsBel) {

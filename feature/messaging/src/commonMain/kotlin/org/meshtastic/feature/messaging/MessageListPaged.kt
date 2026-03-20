@@ -53,7 +53,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import org.meshtastic.core.model.ContactKey
+import org.meshtastic.core.common.util.formatString
+import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
@@ -103,6 +104,7 @@ internal data class MessageListPagedState(
     val searchQuery: String = "",
     val translationAvailable: Boolean = false,
     val showFullMessageTimestamps: Boolean = false,
+    val showRelayInfo: Boolean = false,
 )
 
 private fun MutableState<Set<Long>>.toggle(uuid: Long) {
@@ -336,6 +338,25 @@ private fun RenderPagedChatMessageRow(
             derivedStateOf { state.selectedIds.value.contains(message.uuid) }
         }
     val node = nodeMap[message.node.num] ?: message.node
+    val relayNodeName by
+        remember(message.relayNode, nodeMap, ourNode) {
+            derivedStateOf {
+                message.relayNode?.let { relayNodeId ->
+                    val suffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
+                    val candidates = nodeMap.values.filter {
+                        it.num != ourNode.num && it.lastHeard != 0 &&
+                            (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == suffix
+                    }
+                    when {
+                        candidates.size > 1 -> candidates
+                            .sortedByDescending { (it.snr * 3) + (it.rssi + 120) }
+                            .joinToString("/") { it.user.short_name }
+                        candidates.size == 1 -> candidates.first().user.long_name
+                        else -> formatString("0x%02X", suffix)
+                    }
+                }
+            }
+        }
 
     // Resolve an @mention token ("!<hex>" = numeric node id) back to its node for live name + tap-to-open.
     val resolveMention: (String) -> Node? =
@@ -389,6 +410,7 @@ private fun RenderPagedChatMessageRow(
                 }
             }
         },
+        relayNodeName = if (state.showRelayInfo) relayNodeName else null,
         hasSamePrev = hasSamePrev,
         hasSameNext = hasSameNext,
         quickEmojis = quickEmojis,

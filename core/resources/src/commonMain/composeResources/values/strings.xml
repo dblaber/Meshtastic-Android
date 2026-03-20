@@ -1407,6 +1407,13 @@
         <item quantity="one">%1$d hour</item>
         <item quantity="other">%1$d hours</item>
     </plurals>
+    <string name="relayed_by">Relayed by: %1$s</string>
+    <string name="show_relay_info">Show relay info</string>
+    <plurals name="relays">
+        <item quantity="one">Heard %1$d relay</item>
+        <item quantity="other">Heard %1$d relays</item>
+    </plurals>
+    </plurals>
     <plurals name="plurals_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

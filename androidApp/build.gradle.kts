@@ -165,7 +165,15 @@ configure<ApplicationExtension> {
         configureEach {
             versionName = "${defaultConfig.versionName} (${defaultConfig.versionCode}) $name"
             if (name == "google") {
-                manifestPlaceholders["MAPS_API_KEY"] = "dummy"
+                val secretsFile = rootProject.file("secrets.properties")
+                val mapsKey = if (secretsFile.exists()) {
+                    val props = Properties()
+                    FileInputStream(secretsFile).use { props.load(it) }
+                    props.getProperty("MAPS_API_KEY", "dummy")
+                } else {
+                    "dummy"
+                }
+                manifestPlaceholders["MAPS_API_KEY"] = mapsKey
             }
         }
     }
@@ -194,7 +202,7 @@ ksp { arg("appfunctions:aggregateAppFunctions", "true") }
 
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
-        variant.flavorName?.let { flavor -> variant.applicationId.set("com.geeksville.mesh.$flavor.debug") }
+        variant.flavorName?.let { flavor -> variant.applicationId = "com.geeksville.mesh.relaydev.$flavor.debug" }
     }
 
     onVariants(selector().withBuildType("release")) { variant ->

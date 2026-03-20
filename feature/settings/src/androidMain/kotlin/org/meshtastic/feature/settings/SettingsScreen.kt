@@ -255,6 +255,8 @@ fun SettingsScreen(
                         homoglyphEnabled =
                         viewModel.homoglyphEncodingEnabledFlow.collectAsStateWithLifecycle(false).value,
                         onToggleHomoglyph = { viewModel.toggleHomoglyphCharactersEncodingEnabled() },
+                        showRelayInfo = settingsViewModel.showRelayInfo.collectAsStateWithLifecycle().value,
+                        onToggleShowRelayInfo = { settingsViewModel.setShowRelayInfo(it) },
                         startProvideLocation = { settingsViewModel.startProvidingLocation() },
                         stopProvideLocation = { settingsViewModel.stopProvidingLocation() },
                     )
