@@ -36,15 +36,13 @@ jobs:
         env:
           KEYSTORE: ${{ secrets.KEYSTORE }}
         if: env.KEYSTORE != ''
-        run: echo "$KEYSTORE" | base64 -d > release-keystore.jks
+        run: echo "$KEYSTORE" | base64 -d > app/release-keystore.jks
 
       - name: Create keystore.properties
         env:
           KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
         if: env.KEYSTORE_PROPERTIES != ''
-        run: |
-          echo "$KEYSTORE_PROPERTIES" > keystore.properties
-          sed -i "s|storeFile=.*|storeFile=$GITHUB_WORKSPACE/release-keystore.jks|" keystore.properties
+        run: echo "$KEYSTORE_PROPERTIES" > keystore.properties
 
       - name: Decode google-services.json
         env:
