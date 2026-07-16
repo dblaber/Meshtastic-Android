@@ -18,6 +18,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import org.meshtastic.buildlogic.configProperties
 import org.meshtastic.buildlogic.resolveVersionInfo
+import java.io.FileInputStream
 import java.util.Properties
 
 val versionInfo = resolveVersionInfo()
