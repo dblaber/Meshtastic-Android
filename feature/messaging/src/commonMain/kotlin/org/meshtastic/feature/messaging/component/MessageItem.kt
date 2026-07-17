@@ -70,6 +70,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_message_from
 import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
+import org.meshtastic.core.resources.message_translated_label
 import org.meshtastic.core.resources.relayed_by
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified

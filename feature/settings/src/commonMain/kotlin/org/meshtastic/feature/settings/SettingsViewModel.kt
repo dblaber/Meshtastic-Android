@@ -178,8 +178,8 @@ class SettingsViewModel(
         uiPrefs.setShowRelayInfo(show)
     }
 
-    fun unlockExcludedModules() {
-        _excludedModulesUnlocked.update { true }
+    fun unlockHiddenFeatures() {
+        hiddenFeaturesUnlock.unlock()
     }
 
     /**

@@ -1413,7 +1413,6 @@
         <item quantity="one">Heard %1$d relay</item>
         <item quantity="other">Heard %1$d relays</item>
     </plurals>
-    </plurals>
     <plurals name="plurals_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
@@ -1506,6 +1505,7 @@
     <string name="regenerate_keys_confirmation">Are you sure you want to regenerate your Private Key?\n\nNodes that may have previously exchanged keys with this node will need to Remove that node and re-exchange keys in order to resume secure communication.</string>
     <string name="regenerate_private_key">Regenerate Private Key</string>
     <string name="region_frequency_plan">Region</string>
+    <string name="relayed_by">Relayed by: %1$s</string>
     <plurals name="relays">
         <item quantity="one">Heard %1$d relay</item>
         <item quantity="other">Heard %1$d relays</item>
@@ -1686,6 +1686,7 @@
     <string name="show_original">Show original</string>
     <string name="show_password">Show password</string>
     <string name="show_precision_circle">Show Precision Circles</string>
+    <string name="show_relay_info">Show relay info</string>
     <string name="show_translation">Show translation</string>
     <string name="show_waypoints">Show Waypoints</string>
     <string name="shutdown">Shutdown</string>

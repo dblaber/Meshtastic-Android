@@ -314,7 +314,6 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_SHOW_QUICK_CHAT_PREF = booleanPreferencesKey("show-quick-chat")
         val KEY_SHOW_FULL_MESSAGE_TIMESTAMPS = booleanPreferencesKey("show-full-message-timestamps")
         val KEY_SHOW_RELAY_INFO_PREF = booleanPreferencesKey("show-relay-info")
-        val KEY_EVENT_THEME_ENABLED = booleanPreferencesKey("event-theme-enabled")
 
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_THEME = intPreferencesKey("theme")
@@ -327,6 +326,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_SHOW_IGNORED = booleanPreferencesKey("show-ignored")
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
         val KEY_BLE_AUTO_SCAN = booleanPreferencesKey("ble-auto-scan")
+        val KEY_EVENT_THEME_ENABLED = booleanPreferencesKey("event-theme-enabled")
         val KEY_NETWORK_AUTO_SCAN = booleanPreferencesKey("network-auto-scan")
         val KEY_SELECTED_CONNECTION_TRANSPORT = stringPreferencesKey("selected-connection-transport")
         val KEY_FIRMWARE_UPDATE_NOTIFICATION_KEYS = stringPreferencesKey("firmware-update-notification-keys")

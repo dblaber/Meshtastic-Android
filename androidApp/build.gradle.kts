@@ -167,13 +167,14 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName} (${defaultConfig.versionCode}) $name"
             if (name == "google") {
                 val secretsFile = rootProject.file("secrets.properties")
-                val mapsKey = if (secretsFile.exists()) {
-                    val props = Properties()
-                    FileInputStream(secretsFile).use { props.load(it) }
-                    props.getProperty("MAPS_API_KEY", "dummy")
-                } else {
-                    "dummy"
-                }
+                val mapsKey =
+                    if (secretsFile.exists()) {
+                        val props = Properties()
+                        FileInputStream(secretsFile).use { props.load(it) }
+                        props.getProperty("MAPS_API_KEY", "dummy")
+                    } else {
+                        "dummy"
+                    }
                 manifestPlaceholders["MAPS_API_KEY"] = mapsKey
             }
         }
