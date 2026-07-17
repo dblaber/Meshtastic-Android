@@ -1520,6 +1520,7 @@ refresh
 refresh_metadata
 regenerate_keys_confirmation
 regenerate_private_key
+relayed_by
 relays
 ### REMOTE ###
 remote
@@ -1743,6 +1744,7 @@ show_layer
 show_original
 show_password
 show_precision_circle
+show_relay_info
 show_translation
 show_waypoints
 shutdown
