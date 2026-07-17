@@ -1393,6 +1393,13 @@
     <string name="paxcounter_enabled">Paxcounter enabled</string>
     <string name="periodic_position_broadcast">Periodic position broadcast</string>
     <string name="permission_missing_31">Meshtastic needs "Nearby devices" permissions enabled to find and connect to devices via Bluetooth. You can disable when not in use.</string>
+    <string name="phone_location">Phone Location</string>
+    <string name="phone_location_description">Meshtastic uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
+    <string name="play">Play</string>
+    <plurals name="plurals_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
     <plurals name="plurals_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
