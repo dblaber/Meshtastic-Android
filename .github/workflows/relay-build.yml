@@ -88,6 +88,8 @@ jobs:
           draft: false
           prerelease: true
           generate_release_notes: true
+          make_latest: false
+          fail_on_unmatched_files: true
           files: |
             androidApp/build/outputs/apk/google/release/*.apk
             androidApp/build/outputs/apk/fdroid/release/*.apk
