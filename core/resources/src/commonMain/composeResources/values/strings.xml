@@ -221,7 +221,7 @@
     <string name="chirpy_error_unknown">Oops! We hit some heavy packet loss or signal interference! 📡 Let's re-transmit that query and see if we can get through.</string>
     <string name="chirpy_error_unsupported_flavor">I'm operating on a limited frequency on this app flavor! 🔌 Try using a version with full AI Core integration.</string>
     <string name="chirpy_error_unsupported_platform">Oh no! My antenna can't seem to establish a connection on this platform. 📡 Please double-check your hardware compatibility!</string>
-    <string name="chirpy_intro">Hey there! 📡 I'm Chirpy, your on-device Meshtastic assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
+    <string name="chirpy_intro">Hey there! 📡 I\'m Chirpy, your on-device Meshtastic assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
     <string name="chirpy_ready">Ask Chirpy</string>
     <string name="chirpy_search_placeholder">Ask about Meshtastic…</string>
     <string name="chirpy_suggested_pages_help">Here are some documentation pages that might help:</string>
@@ -285,7 +285,7 @@
     <string name="config_display_wake_on_tap_or_motion_summary">Requires that there be an accelerometer on your device.</string>
     <string name="config_lora_frequency_slot_summary">Your node’s operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot. Change back to the public default slot if private primary and public secondary channels are configured.</string>
     <string name="config_lora_hop_limit_summary">Sets the maximum number of hops, default is 3. Increasing hops also increases congestion and should be used carefully. 0 hop broadcast messages will not get ACKs.</string>
-    <string name="config_lora_modem_preset_licensed_summary">This region's presets are for licensed (amateur radio) operators only. Enable Licensed amateur radio (Ham) in User Config to select them.</string>
+    <string name="config_lora_modem_preset_licensed_summary">This region\'s presets are for licensed (amateur radio) operators only. Enable Licensed amateur radio (Ham) in User Config to select them.</string>
     <string name="config_lora_modem_preset_summary">Available modem presets, default is Long Fast.</string>
     <string name="config_lora_region_summary">The region where you will be using your radios.</string>
     <string name="config_network_eth_enabled_summary">Enabling Ethernet will disable the bluetooth connection to the app. TCP node connections are not available on Apple devices.</string>
@@ -689,15 +689,14 @@
     <string name="firmware_maintenance_wrong_destination">That location isn't the device's update drive, so nothing was written to the device. Select the removable drive that appears when the device is in update mode.</string>
     <string name="firmware_old">The radio firmware is too old to talk to this application. For more information on this see <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">our Firmware Installation guide</a>.</string>
     <string name="firmware_recovery_banner">Finish updating %1$s</string>
-    <string name="firmware_recovery_ble_failed">Couldn't finish the update over Bluetooth. This device's stock bootloader can't reliably complete an interrupted update over the air. Connect it to a computer with USB and re-flash it using the vendor's serial DFU tool (for example adafruit-nrfutil) to recover the device.</string>
+    <string name="firmware_recovery_ble_failed">Couldn\'t finish the update over Bluetooth. This device\'s stock bootloader can\'t reliably complete an interrupted update over the air. Connect it to a computer with USB and re-flash it using the vendor\'s serial DFU tool (for example adafruit-nrfutil) to recover the device.</string>
     <string name="firmware_recovery_button">Resume firmware update</string>
     <string name="firmware_recovery_dismiss">Dismiss firmware recovery</string>
     <string name="firmware_recovery_explanation">This device is in bootloader mode from a firmware update that did not finish. Keep it nearby and it will be re-flashed to complete the update.</string>
     <string name="firmware_too_old">Firmware update required.</string>
     <string name="firmware_update_almost_there">Almost there...</string>
     <string name="firmware_update_alpha">Alpha</string>
-    <string name="firmware_update_archive_missing_target">No firmware for %2$s (%3$s) was found in "%1$s".</string>
-    <string name="firmware_update_available">Firmware update available</string>
+    <string name="firmware_update_archive_missing_target">No firmware for %2$s (%3$s) was found in \"%1$s\".</string>
     <string name="firmware_update_battery_low">Battery too low (%1$d%). Please charge your device before updating.</string>
     <string name="firmware_update_checking">Checking for updates...</string>
     <string name="firmware_update_confirm_file_button">Start Flashing</string>
@@ -724,7 +723,7 @@
     <string name="firmware_update_flashing">Flashing device, please wait...</string>
     <string name="firmware_update_hang_tight">Hang tight, we are working on it...</string>
     <string name="firmware_update_hash_rejected">Firmware hash rejected. Device may require hash provisioning or bootloader update.</string>
-    <string name="firmware_update_invalid_local_file_detail">The selected file "%1$s" does not match %2$s (%3$s). Choose the firmware file for this target.</string>
+    <string name="firmware_update_invalid_local_file_detail">The selected file \"%1$s\" does not match %2$s (%3$s). Choose the firmware file for this target.</string>
     <string name="firmware_update_keep_device_close">Keep your device close to your phone.</string>
     <string name="firmware_update_latest">Update To: %1$s</string>
     <string name="firmware_update_local_file">Local File</string>
@@ -737,10 +736,6 @@
     <string name="firmware_update_no_device">No device connected</string>
     <string name="firmware_update_node_info_missing">Node user information is missing.</string>
     <string name="firmware_update_not_found_in_release">Could not find firmware for %1$s in release.</string>
-    <string name="firmware_update_notification_android">%1$s is installed. Stable %2$s is available. Open Firmware Updates when you're ready.</string>
-    <string name="firmware_update_notification_flasher">%1$s is installed. Stable %2$s is available. Open Meshtastic Flasher to update this hardware.</string>
-    <string name="firmware_update_open">Open Firmware Updates</string>
-    <string name="firmware_update_open_flasher">Open Meshtastic Flasher</string>
     <string name="firmware_update_ota_failed">OTA update failed: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">This device's OTA loader rejected the requested update method: %1$s</string>
     <string name="firmware_update_rak4631_bootloader_hint">For RAK WisBlock RAK4631, the vendor's bootloader .zip has to be flashed with a serial DFU tool such as adafruit-nrfutil — copying that .zip to the device's drive won't work. Alternatively, connect this device over USB and use the bootloader upgrade in this app.</string>
@@ -874,9 +869,7 @@
     <string name="ignore_incoming">Ignore incoming</string>
     <string name="ignore_mqtt">Ignore MQTT</string>
     <string name="ignore_remove">Remove '%1$s' from ignore list?</string>
-    <!-- IMPORT -->
     <string name="import_configuration">Import configuration</string>
-    <string name="import_export_label">Import/Export</string>
     <string name="import_known_shared_contact_text">Warning: This contact is known, importing will overwrite the previous contact information.</string>
     <string name="import_label">Import</string>
     <string name="import_shared_contact">Import Shared Contact?</string>
@@ -1199,7 +1192,7 @@
     <string name="mqtt_probe_timeout">Timed out after %1$d ms</string>
     <string name="mqtt_probe_tls_failure">TLS handshake failed: %1$s</string>
     <string name="mqtt_proxy_local">MQTT proxy on this phone</string>
-    <string name="mqtt_proxy_local_summary">This phone relays MQTT traffic for the connected device. Turn off to cut the relay immediately without changing the device's MQTT setting — useful when MQTT traffic is overwhelming the connection. Turn back on to resume relaying.</string>
+    <string name="mqtt_proxy_local_summary">This phone relays MQTT traffic for the connected device. Turn off to cut the relay immediately without changing the device\'s MQTT setting — useful when MQTT traffic is overwhelming the connection. Turn back on to resume relaying.</string>
     <string name="mqtt_status_connected">Connected</string>
     <string name="mqtt_status_connecting">Connecting…</string>
     <string name="mqtt_status_disconnected">Disconnected</string>
@@ -1400,19 +1393,6 @@
     <string name="paxcounter_enabled">Paxcounter enabled</string>
     <string name="periodic_position_broadcast">Periodic position broadcast</string>
     <string name="permission_missing_31">Meshtastic needs "Nearby devices" permissions enabled to find and connect to devices via Bluetooth. You can disable when not in use.</string>
-    <string name="phone_location">Phone Location</string>
-    <string name="phone_location_description">Meshtastic uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
-    <string name="play">Play</string>
-    <plurals name="plurals_hours">
-        <item quantity="one">%1$d hour</item>
-        <item quantity="other">%1$d hours</item>
-    </plurals>
-    <string name="relayed_by">Relayed by: %1$s</string>
-    <string name="show_relay_info">Show relay info</string>
-    <plurals name="relays">
-        <item quantity="one">Heard %1$d relay</item>
-        <item quantity="other">Heard %1$d relays</item>
-    </plurals>
     <plurals name="plurals_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
@@ -1636,7 +1616,7 @@
     <string name="security_icon_insecure_precise_only">Insecure Channel, Precise Location</string>
     <string name="security_icon_secure">Secure</string>
     <string name="security_icon_warning_precise_mqtt">Warning: Insecure, Precise Location &amp; MQTT Uplink</string>
-    <string name="security_signed_message_info">Verified with the sender's key.</string>
+    <string name="security_signed_message_info">Verified with the sender\'s key.</string>
     <string name="security_signed_node">Signed node</string>
     <string name="security_signed_node_desc">Verified automatically</string>
     <string name="security_signed_node_help">This node signs its broadcasts with XEdDSA. Broadcasts you see from it are verified by the radio using its identity key.</string>
@@ -1730,7 +1710,6 @@
     <string name="soil_temperature">Soil Temp</string>
     <string name="speed">Speed</string>
     <string name="speed_kmh">%1$d Km/h</string>
-    <string name="speed_mph">%1$d mph</string>
     <string name="spread_factor">Spread Factor</string>
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">State broadcast (seconds)</string>
@@ -1944,10 +1923,14 @@
     <string name="wait_for_bluetooth_duration_seconds">Wait for Bluetooth duration</string>
     <string name="wake_on_tap_or_motion">Wake on tap or motion</string>
     <string name="warning">Warning</string>
+    <!-- WAYPOINT -->
     <string name="waypoint_delete">Delete waypoint?</string>
     <string name="waypoint_edit">Edit waypoint</string>
     <string name="waypoint_new">New waypoint</string>
     <string name="waypoint_received">Received waypoint: %1$s</string>
+    <string name="waypoint_recipient_broadcast">Broadcast (all nodes)</string>
+    <string name="waypoint_recipient_channel">Channel %1$d</string>
+    <string name="waypoint_send_to">Send to</string>
     <string name="website">Website</string>
     <string name="weight">Weight</string>
     <string name="what_is_meshtastic">What is Meshtastic?</string>
@@ -2001,10 +1984,8 @@
     <string name="wind_gust">Wind Gust</string>
     <string name="wind_lull">Wind Lull</string>
     <string name="wind_speed">Wind Speed</string>
-    <!-- WRITE -->
     <string name="write_nfc">Write to NFC tag</string>
-    <string name="write_nfc_failed">Couldn't write to tag. Use a writable, empty NFC tag and hold it steady.</string>
-    <string name="write_nfc_subtext">Writing saves this share link to a physical NFC tag. Anyone can tap the tag with their phone to open it.</string>
+    <string name="write_nfc_failed">Couldn\'t write to tag. Use a writable, empty NFC tag and hold it steady.</string>
     <string name="write_nfc_success">Written to tag</string>
     <string name="write_nfc_text">Hold a writable NFC tag against the back of your phone.</string>
     <string name="you">You</string>
