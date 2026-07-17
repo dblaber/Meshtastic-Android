@@ -75,6 +75,8 @@ import org.meshtastic.feature.messaging.component.UnreadMessagesDivider
 import kotlin.math.abs
 
 private const val HEX_RADIX = 16
+private const val RELAY_SNR_WEIGHT = 3
+private const val RELAY_RSSI_OFFSET = 120
 
 /**
  * Messages merge into one visual group only when they are from the same sender AND close in time. The group header
@@ -360,7 +362,7 @@ private fun MessageListPagedContent(
     }
 }
 
-@Suppress("LongParameterList", "LongMethod")
+@Suppress("LongParameterList", "LongMethod", "CyclomaticComplexMethod")
 @Composable
 private fun RenderPagedChatMessageRow(
     message: Message,
@@ -374,13 +376,13 @@ private fun RenderPagedChatMessageRow(
     listState: LazyListState,
     onShowStatusDialog: (Message) -> Unit,
     onShowReactions: (List<Reaction>) -> Unit,
-    modifier: Modifier = Modifier,
     showUserName: Boolean,
     hasSamePrev: Boolean,
     hasSameNext: Boolean,
     openReactionBarFor: Long?,
     onOpenReactionBarChange: (Long?) -> Unit,
     quickEmojis: List<String>,
+    modifier: Modifier = Modifier,
 ) {
     val ourNode = state.ourNode ?: return
     val selected by
@@ -393,15 +395,20 @@ private fun RenderPagedChatMessageRow(
             derivedStateOf {
                 message.relayNode?.let { relayNodeId ->
                     val suffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
-                    val candidates = nodeMap.values.filter {
-                        it.num != ourNode.num && it.lastHeard != 0 &&
-                            (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == suffix
-                    }
+                    val candidates =
+                        nodeMap.values.filter {
+                            it.num != ourNode.num &&
+                                it.lastHeard != 0 &&
+                                (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == suffix
+                        }
                     when {
-                        candidates.size > 1 -> candidates
-                            .sortedByDescending { (it.snr * 3) + (it.rssi + 120) }
-                            .joinToString("/") { it.user.short_name }
+                        candidates.size > 1 ->
+                            candidates
+                                .sortedByDescending { (it.snr * RELAY_SNR_WEIGHT) + (it.rssi + RELAY_RSSI_OFFSET) }
+                                .joinToString("/") { it.user.short_name }
+
                         candidates.size == 1 -> candidates.first().user.long_name
+
                         else -> formatString("0x%02X", suffix)
                     }
                 }
