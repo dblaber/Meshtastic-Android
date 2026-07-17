@@ -71,14 +71,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-google-release
-          path: androidApp/build/outputs/apk/google/release/androidApp-google-release.apk
+          path: androidApp/build/outputs/apk/google/release/*.apk
           retention-days: 30
 
       - name: Upload F-Droid APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-fdroid-release
-          path: androidApp/build/outputs/apk/fdroid/release/androidApp-fdroid-release.apk
+          path: androidApp/build/outputs/apk/fdroid/release/*.apk
           retention-days: 30
 
       - name: Create GitHub Release
@@ -89,5 +89,5 @@ jobs:
           prerelease: true
           generate_release_notes: true
           files: |
-            androidApp/build/outputs/apk/google/release/androidApp-google-release.apk
-            androidApp/build/outputs/apk/fdroid/release/androidApp-fdroid-release.apk
+            androidApp/build/outputs/apk/google/release/*.apk
+            androidApp/build/outputs/apk/fdroid/release/*.apk
