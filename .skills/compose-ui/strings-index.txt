@@ -842,6 +842,7 @@ ignore_remove
 import_configuration
 import_known_shared_contact_text
 import_label
+import_export_label
 import_shared_contact
 incoming_messages
 indoor_air_quality_iaq
