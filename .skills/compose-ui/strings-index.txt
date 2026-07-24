@@ -1656,6 +1656,7 @@ soil_moisture
 soil_temperature
 speed
 speed_kmh
+speed_mph
 spread_factor
 ssid
 state_broadcast_seconds
