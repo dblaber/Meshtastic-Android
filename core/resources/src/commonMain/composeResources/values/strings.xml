@@ -698,10 +698,6 @@
     <string name="firmware_update_alpha">Alpha</string>
     <string name="firmware_update_archive_missing_target">No firmware for %2$s (%3$s) was found in "%1$s".</string>
     <string name="firmware_update_available">Firmware update available</string>
-    <string name="firmware_update_notification_android">%1$s is installed. Stable %2$s is available. Open Firmware Updates when you're ready.</string>
-    <string name="firmware_update_notification_flasher">%1$s is installed. Stable %2$s is available. Open Meshtastic Flasher to update this hardware.</string>
-    <string name="firmware_update_open">Open Firmware Updates</string>
-    <string name="firmware_update_open_flasher">Open Meshtastic Flasher</string>
     <string name="firmware_update_battery_low">Battery too low (%1$d%). Please charge your device before updating.</string>
     <string name="firmware_update_checking">Checking for updates...</string>
     <string name="firmware_update_confirm_file_button">Start Flashing</string>
@@ -741,6 +737,10 @@
     <string name="firmware_update_no_device">No device connected</string>
     <string name="firmware_update_node_info_missing">Node user information is missing.</string>
     <string name="firmware_update_not_found_in_release">Could not find firmware for %1$s in release.</string>
+    <string name="firmware_update_notification_android">%1$s is installed. Stable %2$s is available. Open Firmware Updates when you're ready.</string>
+    <string name="firmware_update_notification_flasher">%1$s is installed. Stable %2$s is available. Open Meshtastic Flasher to update this hardware.</string>
+    <string name="firmware_update_open">Open Firmware Updates</string>
+    <string name="firmware_update_open_flasher">Open Meshtastic Flasher</string>
     <string name="firmware_update_ota_failed">OTA update failed: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">This device's OTA loader rejected the requested update method: %1$s</string>
     <string name="firmware_update_rak4631_bootloader_hint">For RAK WisBlock RAK4631, the vendor's bootloader .zip has to be flashed with a serial DFU tool such as adafruit-nrfutil — copying that .zip to the device's drive won't work. Alternatively, connect this device over USB and use the bootloader upgrade in this app.</string>
@@ -874,11 +874,12 @@
     <string name="ignore_incoming">Ignore incoming</string>
     <string name="ignore_mqtt">Ignore MQTT</string>
     <string name="ignore_remove">Remove '%1$s' from ignore list?</string>
+    <!-- IMPORT -->
     <string name="import_configuration">Import configuration</string>
+    <string name="import_export_label">Import/Export</string>
     <string name="import_known_shared_contact_text">Warning: This contact is known, importing will overwrite the previous contact information.</string>
     <string name="import_label">Import</string>
     <string name="import_shared_contact">Import Shared Contact?</string>
-    <string name="import_export_label">Import/Export</string>
     <string name="incoming_messages">Incoming Messages</string>
     <string name="indoor_air_quality_iaq">Indoor Air Quality (IAQ)</string>
     <string name="info">Information</string>
@@ -1998,8 +1999,10 @@
     <string name="wind_gust">Wind Gust</string>
     <string name="wind_lull">Wind Lull</string>
     <string name="wind_speed">Wind Speed</string>
+    <!-- WRITE -->
     <string name="write_nfc">Write to NFC tag</string>
     <string name="write_nfc_failed">Couldn\'t write to tag. Use a writable, empty NFC tag and hold it steady.</string>
+    <string name="write_nfc_subtext">Writing saves this share link to a physical NFC tag. Anyone can tap the tag with their phone to open it.</string>
     <string name="write_nfc_success">Written to tag</string>
     <string name="write_nfc_text">Hold a writable NFC tag against the back of your phone.</string>
     <string name="you">You</string>
