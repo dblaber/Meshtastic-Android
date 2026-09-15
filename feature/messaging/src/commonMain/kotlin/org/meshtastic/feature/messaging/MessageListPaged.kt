@@ -60,7 +60,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.common.util.isSameLocalDay
-import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
@@ -75,6 +74,7 @@ import org.meshtastic.feature.messaging.component.UnreadMessagesDivider
 import kotlin.math.abs
 
 private const val HEX_RADIX = 16
+private const val RELAY_NODE_SUFFIX_MASK = 0xFF
 private const val RELAY_SNR_WEIGHT = 3
 private const val RELAY_RSSI_OFFSET = 120
 
@@ -394,12 +394,12 @@ private fun RenderPagedChatMessageRow(
         remember(message.relayNode, nodeMap, ourNode) {
             derivedStateOf {
                 message.relayNode?.let { relayNodeId ->
-                    val suffix = relayNodeId and Packet.RELAY_NODE_SUFFIX_MASK
+                    val suffix = relayNodeId and RELAY_NODE_SUFFIX_MASK
                     val candidates =
                         nodeMap.values.filter {
                             it.num != ourNode.num &&
                                 it.lastHeard != 0 &&
-                                (it.num and Packet.RELAY_NODE_SUFFIX_MASK) == suffix
+                                (it.num and RELAY_NODE_SUFFIX_MASK) == suffix
                         }
                     when {
                         candidates.size > 1 ->

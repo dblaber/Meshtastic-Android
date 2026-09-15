@@ -22,7 +22,6 @@ import org.meshtastic.buildlogic.LocaleQualifiersValueSource
 import org.meshtastic.buildlogic.configProperties
 import org.meshtastic.buildlogic.resolveVersionInfo
 import org.meshtastic.buildlogic.resourceLocaleFilters
-import java.io.FileInputStream
 import java.util.Properties
 
 val versionInfo = resolveVersionInfo()
